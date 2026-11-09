@@ -27,6 +27,24 @@ all around it. Reading a good doc shouldn't feel like debugging.
 
 zread opens on the text itself. Nothing else competes for your attention.
 
+## Light on purpose
+
+zread opens as fast as Zed, uses about half of its memory, and takes up 1 MB on
+disk.
+
+| App | Window on screen | Memory | Size on disk |
+| --- | --- | --- | --- |
+| **zread 0.1.2** | **395 ms** | **203 MB** | **1 MB** |
+| Zed 1.27.0 | 398 ms | 396 MB | 176 MB |
+| Ghostty 1.3.1 | 513 ms | 594 MB | 62 MB |
+
+Measured on one M4 Pro with macOS 26.3.1. Each number is the median of five warm
+launches, with zread and Zed opening a 400-section document and Ghostty opening
+an empty window with its existing config. Memory is physical footprint six
+seconds after launch, and includes the WebKit helpers zread relies on. These apps
+do different jobs: Zed is a full editor, Ghostty is a terminal, and zread stays
+small because WebKit already ships with macOS.
+
 ## Install
 
 ```sh
