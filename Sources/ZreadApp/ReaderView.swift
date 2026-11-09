@@ -1,11 +1,25 @@
 import AppKit
 import WebKit
 
+private final class ScrollRelay: NSObject, WKScriptMessageHandler {
+    var onLine: ((Int) -> Void)?
+
+    func userContentController(_ controller: WKUserContentController, didReceive message: WKScriptMessage) {
+        if let line = message.body as? Int { onLine?(line) }
+    }
+}
+
 final class ReaderView: NSView {
     let web: WKWebView
     private let router = LinkRouter()
+    private let scrollRelay = ScrollRelay()
     private var isReady = false
     private var pending: [() -> Void] = []
+
+    /// Called with the top visible source line after the reader stops scrolling.
+    var onTopLineChanged: ((Int) -> Void)? {
+        didSet { scrollRelay.onLine = onTopLineChanged }
+    }
 
     var onInternalLink: ((String, String?) -> Void)? {
         didSet { router.onInternalLink = onInternalLink }
@@ -14,6 +28,7 @@ final class ReaderView: NSView {
     init(root: URL) {
         let configuration = WKWebViewConfiguration()
         configuration.setURLSchemeHandler(LocalScheme(root: root), forURLScheme: "zread")
+        configuration.userContentController.add(scrollRelay, name: "zreadScroll")
         web = WKWebView(frame: .zero, configuration: configuration)
         super.init(frame: .zero)
 

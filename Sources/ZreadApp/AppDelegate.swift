@@ -4,13 +4,46 @@ import ZreadCore
 final class AppDelegate: NSObject, NSApplicationDelegate {
     private var controllers: [String: WindowController] = [:]
     private var receivedOpenRequest = false
+    private var welcome: WelcomeWindowController?
+    private static let welcomeSeenKey = "welcomeSeen"
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApp.mainMenu = buildMenu()
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
-            guard let self, !self.receivedOpenRequest, self.controllers.isEmpty else { return }
-            self.openDocument(nil)
+        // The web view can take Cmd+digit before the menu sees it.
+        NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
+            guard event.modifierFlags.intersection(.deviceIndependentFlagsMask) == .command,
+                  event.charactersIgnoringModifiers == "1",
+                  let controller = NSApp.keyWindow?.windowController as? WindowController else { return event }
+            controller.toggleSidebar(nil)
+            return nil
         }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
+            guard let self else { return }
+            let isFirstRun = !UserDefaults.standard.bool(forKey: Self.welcomeSeenKey)
+            if isFirstRun {
+                UserDefaults.standard.set(true, forKey: Self.welcomeSeenKey)
+                self.showWelcome(nil)
+            }
+            guard !self.receivedOpenRequest, self.controllers.isEmpty else { return }
+            if let last = WindowStateStore.lastRoot(), FileManager.default.fileExists(atPath: last) {
+                self.open(path: last)
+            } else if !isFirstRun {
+                self.openDocument(nil)
+            }
+        }
+    }
+
+    @objc func showWelcome(_ sender: Any?) {
+        if welcome == nil {
+            welcome = WelcomeWindowController { [weak self] in self?.openDocument(nil) }
+        }
+        welcome?.showWindow(nil)
+        welcome?.window?.makeKeyAndOrderFront(nil)
+        NSApp.activate(ignoringOtherApps: true)
+    }
+
+    func applicationWillTerminate(_ notification: Notification) {
+        controllers.values.forEach { $0.persistState() }
     }
 
     func application(_ application: NSApplication, open urls: [URL]) {
@@ -64,6 +97,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         panel.allowsMultipleSelection = false
         if panel.runModal() == .OK, let url = panel.url {
             open(path: url.path)
+            // Closed after opening, so the app is never left without a window.
+            welcome?.close()
         }
     }
 
@@ -88,6 +123,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         add(to: main, "zread", [
             item("About zread", #selector(showAbout(_:))),
+            item("Welcome to zread", #selector(showWelcome(_:))),
             .separator(),
             item("Settings…", #selector(WindowController.showSettings(_:)), ","),
             item("Install zread Command", #selector(installCommand(_:))),
@@ -112,7 +148,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         ])
         add(to: main, "View", [
             item("Toggle Reading and Source", #selector(WindowController.toggleSource(_:)), "e"),
-            item("Show or Hide Sidebar", #selector(WindowController.toggleSidebar(_:)), "\\"),
+            item("Show or Hide Sidebar", #selector(WindowController.toggleSidebar(_:)), "1"),
             .separator(),
             item("Toggle Full Screen", #selector(NSWindow.toggleFullScreen(_:)), "f"),
         ])

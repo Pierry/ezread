@@ -1,25 +1,18 @@
-<p align="center">
-  <img src="docs/assets/icon.png" width="112" alt="zread icon">
-</p>
+![zread icon](docs/assets/icon.png)
 
-<h1 align="center">zread</h1>
+# zread
 
-<p align="center">Read the Markdown in your repo like it's an article.</p>
+Read the Markdown in your repo like it's an article.
 
-<p align="center">
-  <a href="https://github.com/Pierry/zread/releases"><img src="https://img.shields.io/github/v/tag/Pierry/zread?label=version&color=2f6fd0" alt="Version"></a>
-  <img src="https://img.shields.io/badge/macOS-14%2B-18191b" alt="macOS 14 or later">
-  <img src="https://img.shields.io/badge/Swift-5.9-2f6fd0" alt="Swift 5.9">
-  <a href="https://github.com/Pierry/homebrew-zread"><img src="https://img.shields.io/badge/Homebrew-tap-18191b" alt="Homebrew tap"></a>
-  <a href="LICENSE"><img src="https://img.shields.io/github/license/Pierry/zread?color=2f6fd0" alt="MIT license"></a>
-</p>
+[![Version](https://img.shields.io/github/v/tag/Pierry/zread?label=version&color=2f6fd0)](https://github.com/Pierry/zread/releases)
+![macOS 14 or later](https://img.shields.io/badge/macOS-14%2B-18191b)
+![Swift 5.9](https://img.shields.io/badge/Swift-5.9-2f6fd0)
+[![Homebrew tap](https://img.shields.io/badge/Homebrew-tap-18191b)](https://github.com/Pierry/homebrew-zread)
+[![MIT license](https://img.shields.io/github/license/Pierry/zread?color=2f6fd0)](LICENSE)
 
-<p align="center"><a href="https://pierry.github.io/zread/">Website</a></p>
+[Website](https://pierry.github.io/zread/)
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="docs/assets/dark.png">
-  <img src="docs/assets/light.png" alt="zread showing a document in a centered column, with the file list on the left">
-</picture>
+![zread showing a document in a centered column, with the file list on the left](docs/assets/light.png)
 
 ## What it is
 
@@ -51,26 +44,27 @@ zread .
 zread docs/design.md
 ```
 
-Links between your docs open right in the app, and the sidebar lists every
-Markdown file in the project. If a file changes on disk, zread picks it up when
-you come back to the window.
+zread picks up where you left off: same file, same spot, same window. Links
+between your docs open right in the app, and the sidebar lists every Markdown
+file in the project. If a file changes on disk, zread reloads it when you come
+back to the window.
 
-Spotted a typo? Click the pencil at the top right, fix it, save, and click the
-book to go back to reading.
+Spotted a typo? Click Edit at the top right, fix it, click Save, then click Read
+to go back to the page.
 
 ## Make it yours
 
 Open Settings at the bottom of the sidebar to choose the theme, font, size,
 letter spacing, line height and the color of your headings and links. Changes
-show up as you make them.
+show up as you make them, and zread remembers them.
 
-<img src="docs/assets/settings.png" alt="The settings in the zread sidebar">
+![The settings in the zread sidebar](docs/assets/settings.png)
 
 | Shortcut | What it does |
 | --- | --- |
 | `Cmd+E` | Switch between reading and editing |
 | `Cmd+S` | Save |
-| `Cmd+\` | Show or hide the sidebar |
+| `Cmd+1` | Show or hide the sidebar |
 | `Cmd+,` | Open settings |
 | `Cmd+O` | Open a folder or file |
 
@@ -78,7 +72,7 @@ show up as you make them.
 
 zread never runs anything from a Markdown file. It drops raw HTML, skips remote
 images, and only reads images inside the folder you opened. The tradeoff is that
-remote badges in a README won't show up.
+remote badges in a README won't show up, including the ones on this page.
 
 ## Build it yourself
 

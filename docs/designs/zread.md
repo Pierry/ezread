@@ -43,6 +43,8 @@ fix what is noticed during reading.
 *   When opening a folder, the first file shown is the root `README.md`. Without
     a README, the screen shows the file tree.
 
+*   Reopening a folder restores the last file, reading position, sidebar, collapsed folders and window size.
+
 **Reading**
 
 *   Reading mode is always the initial mode, for every opened file.

@@ -25,6 +25,9 @@ final class FileTreeView: NSView, NSOutlineViewDataSource, NSOutlineViewDelegate
     private var isSelectingProgrammatically = false
 
     var onSelect: ((String) -> Void)?
+    var onCollapseChanged: (() -> Void)?
+    var collapsedFolders: Set<String> = []
+    private var isRestoringExpansion = false
 
     override init(frame: NSRect) {
         super.init(frame: frame)
@@ -68,8 +71,38 @@ final class FileTreeView: NSView, NSOutlineViewDataSource, NSOutlineViewDelegate
     func update(nodes: [FileNode], selected: String?) {
         items = nodes.map(TreeItem.init)
         outline.reloadData()
+        isRestoringExpansion = true
         outline.expandItem(nil, expandChildren: true)
+        collapseSaved(in: items)
+        isRestoringExpansion = false
         select(relativePath: selected)
+    }
+
+    private func collapseSaved(in list: [TreeItem]) {
+        for item in list where item.node.isDirectory {
+            collapseSaved(in: item.children)
+            if collapsedFolders.contains(item.node.relativePath) {
+                outline.collapseItem(item)
+            }
+        }
+    }
+
+    func outlineViewItemDidCollapse(_ notification: Notification) {
+        updateCollapsed(notification, isCollapsed: true)
+    }
+
+    func outlineViewItemDidExpand(_ notification: Notification) {
+        updateCollapsed(notification, isCollapsed: false)
+    }
+
+    private func updateCollapsed(_ notification: Notification, isCollapsed: Bool) {
+        guard !isRestoringExpansion, let item = notification.userInfo?["NSObject"] as? TreeItem else { return }
+        if isCollapsed {
+            collapsedFolders.insert(item.node.relativePath)
+        } else {
+            collapsedFolders.remove(item.node.relativePath)
+        }
+        onCollapseChanged?()
     }
 
     func select(relativePath: String?) {

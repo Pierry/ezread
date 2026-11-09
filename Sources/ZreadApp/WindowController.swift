@@ -4,6 +4,7 @@ import ZreadCore
 final class WindowController: NSWindowController, NSWindowDelegate, NSMenuItemValidation {
     private static let highlightLimit = 2 * 1024 * 1024
     private static let sidebarWidth: CGFloat = 260
+    private static let frameName = "zread.window"
 
     private let root: URL
     private let split = NSSplitView()
@@ -22,6 +23,8 @@ final class WindowController: NSWindowController, NSWindowDelegate, NSMenuItemVa
     private var lastNodes: [FileNode]?
     private var sidebarDecided = false
     private var measured = false
+    private var state: WindowState
+    private var lastReaderLine = 1
 
     var onClose: (() -> Void)?
 
@@ -29,6 +32,7 @@ final class WindowController: NSWindowController, NSWindowDelegate, NSMenuItemVa
         self.root = root
         SettingsStore.applyAppearance()
         self.reader = ReaderView(root: root)
+        self.state = WindowStateStore.load(root: root.path)
 
         let window = NSWindow(
             contentRect: NSRect(x: 0, y: 0, width: 1040, height: 800),
@@ -42,9 +46,11 @@ final class WindowController: NSWindowController, NSWindowDelegate, NSMenuItemVa
         window.minSize = NSSize(width: 480, height: 560)
         window.isReleasedWhenClosed = false
         window.center()
+        window.setFrameUsingName(Self.frameName)
 
         super.init(window: window)
         window.delegate = self
+        tree.collapsedFolders = Set(state.collapsedFolders)
         buildLayout(in: window)
         connectCallbacks()
     }
@@ -91,7 +97,7 @@ final class WindowController: NSWindowController, NSWindowDelegate, NSMenuItemVa
         let button = NSButton(image: image, target: self, action: #selector(toggleSidebar(_:)))
         button.isBordered = false
         button.contentTintColor = Theme.text
-        button.toolTip = "Show or hide sidebar (Cmd+\\)"
+        button.toolTip = "Show or hide sidebar (Cmd+1)"
         button.frame = NSRect(x: 8, y: 2, width: 28, height: 24)
 
         let holder = NSView(frame: NSRect(x: 0, y: 0, width: 44, height: 28))
@@ -104,20 +110,20 @@ final class WindowController: NSWindowController, NSWindowDelegate, NSMenuItemVa
     }
 
     private func addEditButtons(to window: NSWindow) {
-        saveButton.image = NSImage(systemSymbolName: "square.and.arrow.down", accessibilityDescription: "Save")
+        saveButton.title = "Save"
         saveButton.toolTip = "Save (Cmd+S)"
         saveButton.target = self
         saveButton.action = #selector(saveDocument(_:))
-        saveButton.frame = NSRect(x: 4, y: 2, width: 28, height: 24)
+        saveButton.frame = NSRect(x: 4, y: 3, width: 60, height: 22)
 
         editButton.target = self
         editButton.action = #selector(toggleSource(_:))
-        editButton.frame = NSRect(x: 40, y: 2, width: 28, height: 24)
+        editButton.frame = NSRect(x: 70, y: 3, width: 60, height: 22)
 
-        let holder = NSView(frame: NSRect(x: 0, y: 0, width: 80, height: 28))
+        let holder = NSView(frame: NSRect(x: 0, y: 0, width: 142, height: 28))
         for button in [saveButton, editButton] {
-            button.isBordered = false
-            button.contentTintColor = Theme.text
+            button.bezelStyle = .rounded
+            button.controlSize = .small
             holder.addSubview(button)
         }
 
@@ -133,17 +139,19 @@ final class WindowController: NSWindowController, NSWindowDelegate, NSMenuItemVa
         window?.isDocumentEdited = isDirty
         saveButton.isHidden = !isDirty
         editButton.isEnabled = session != nil
-        let label = isShowingSource ? "Read" : "Edit"
-        editButton.image = NSImage(
-            systemSymbolName: isShowingSource ? "book" : "pencil",
-            accessibilityDescription: label
-        )
-        editButton.toolTip = "\(label) (Cmd+E)"
+        editButton.title = isShowingSource ? "Read" : "Edit"
+        editButton.toolTip = "\(editButton.title) (Cmd+E)"
     }
 
     private func connectCallbacks() {
         tree.onSelect = { [weak self] path in self?.open(relativePath: path, fragment: nil) }
         reader.onInternalLink = { [weak self] path, fragment in self?.open(relativePath: path, fragment: fragment) }
+        reader.onTopLineChanged = { [weak self] line in
+            guard let self, !self.isShowingSource else { return }
+            self.lastReaderLine = line
+            self.persistState()
+        }
+        tree.onCollapseChanged = { [weak self] in self?.persistState() }
         source.onChange = { [weak self] in
             guard let self, let session = self.session else { return }
             session.text = self.source.string
@@ -157,12 +165,38 @@ final class WindowController: NSWindowController, NSWindowDelegate, NSMenuItemVa
         showWindow(nil)
         window?.makeKeyAndOrderFront(nil)
 
-        if let file = target.initialFile {
-            open(file: file, fragment: nil)
-        } else if session == nil {
-            reader.show(html: "<p class=\"empty\">Choose a file from the list.</p>", highlight: false)
+        let isFirstPresentation = session == nil
+        let savedSidebar = state.sidebarVisible // opening a file saves state
+        let resumeFile = state.file.flatMap { PathGuard.resolve(relativePath: $0, root: root) }
+
+        if target.wasFile, let file = target.initialFile {
+            open(file: file, fragment: nil, line: file.path == resumeFile?.path ? state.line : nil)
+        } else if isFirstPresentation {
+            if let resumeFile {
+                open(file: resumeFile, fragment: nil, line: state.line)
+            } else if let file = target.initialFile {
+                open(file: file, fragment: nil)
+            } else {
+                reader.show(html: "<p class=\"empty\">Choose a file from the list.</p>", highlight: false)
+            }
         }
-        refreshTree(showSidebarIfUseful: !target.wasFile, forceSidebar: target.initialFile == nil)
+
+        if isFirstPresentation, let visible = savedSidebar {
+            sidebarDecided = true
+            setSidebar(visible: visible)
+        }
+        refreshTree(showSidebarIfUseful: !target.wasFile, forceSidebar: session == nil)
+    }
+
+    /// Saved on every change, so a crash or forced quit loses almost nothing.
+    func persistState() {
+        guard session != nil else { return }
+        if isShowingSource { lastReaderLine = source.topVisibleLine() }
+        state.file = currentRelativePath
+        state.line = lastReaderLine
+        state.sidebarVisible = !sidebar.isHidden
+        state.collapsedFolders = tree.collapsedFolders.sorted()
+        WindowStateStore.save(state, root: root.path)
     }
 
     private func open(relativePath: String, fragment: String?) {
@@ -173,7 +207,7 @@ final class WindowController: NSWindowController, NSWindowDelegate, NSMenuItemVa
         open(file: file, fragment: fragment)
     }
 
-    private func open(file: URL, fragment: String?) {
+    private func open(file: URL, fragment: String?, line: Int? = nil) {
         if session?.url.path == file.path {
             if let fragment { reader.scrollTo(anchor: fragment) }
             return
@@ -197,10 +231,16 @@ final class WindowController: NSWindowController, NSWindowDelegate, NSMenuItemVa
         window?.title = file.lastPathComponent
         window?.representedURL = file
         showReaderPane()
+        lastReaderLine = line ?? 1
         render {
-            if let fragment { self.reader.scrollTo(anchor: fragment) }
+            if let fragment {
+                self.reader.scrollTo(anchor: fragment)
+            } else if let line {
+                self.reader.scrollTo(line: line)
+            }
         }
         tree.select(relativePath: currentRelativePath)
+        persistState()
     }
 
     private var currentRelativePath: String? {
@@ -294,6 +334,15 @@ final class WindowController: NSWindowController, NSWindowDelegate, NSMenuItemVa
             split.setPosition(Self.sidebarWidth, ofDividerAt: 0)
         }
         split.adjustSubviews()
+        persistState()
+    }
+
+    func windowDidMove(_ notification: Notification) {
+        window?.saveFrame(usingName: Self.frameName)
+    }
+
+    func windowDidResize(_ notification: Notification) {
+        window?.saveFrame(usingName: Self.frameName)
     }
 
     // MARK: Saving
@@ -357,6 +406,7 @@ final class WindowController: NSWindowController, NSWindowDelegate, NSMenuItemVa
     }
 
     func windowWillClose(_ notification: Notification) {
+        persistState()
         onClose?()
     }
 
