@@ -10,18 +10,18 @@ enum CLIInstaller {
         do {
             if let existing = try? manager.destinationOfSymbolicLink(atPath: linkPath) {
                 if existing == binary {
-                    show("O comando zread já está instalado.", linkPath)
+                    show("The zread command is already installed.", linkPath)
                     return
                 }
                 try manager.removeItem(atPath: linkPath)
             } else if manager.fileExists(atPath: linkPath) {
-                show("Já existe um arquivo em \(linkPath).", "Remova-o e tente de novo.")
+                show("A file already exists at \(linkPath).", "Remove it and try again.")
                 return
             }
             try manager.createSymbolicLink(atPath: linkPath, withDestinationPath: binary)
-            show("Comando zread instalado.", linkPath)
+            show("zread command installed.", linkPath)
         } catch {
-            show("Sem permissão para instalar. Rode no terminal:", "sudo ln -sf \"\(binary)\" \(linkPath)")
+            show("No permission to install. Run this in Terminal:", "sudo ln -sf \"\(binary)\" \(linkPath)")
         }
     }
 

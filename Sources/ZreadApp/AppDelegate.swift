@@ -37,9 +37,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             controller.present(target: target)
             NSApp.activate(ignoringOtherApps: true)
         } catch RootResolverError.notMarkdown {
-            showAlert("O zread só abre pastas e arquivos Markdown.", path)
+            showAlert("zread only opens folders and Markdown files.", path)
         } catch {
-            showAlert("Não encontrei este caminho.", path)
+            showAlert("Path not found.", path)
         }
     }
 
@@ -69,7 +69,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     @objc func showAbout(_ sender: Any?) {
         let credits = NSAttributedString(
-            string: "Leitor de Markdown para macOS.\nAbra uma pasta ou um arquivo com zread . ou Cmd+O.",
+            string: "A Markdown reader for macOS.\nOpen a folder or file with zread . or Cmd+O.",
             attributes: [
                 .font: NSFont.systemFont(ofSize: 11),
                 .foregroundColor: NSColor.labelColor,
@@ -87,37 +87,37 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let main = NSMenu()
 
         add(to: main, "zread", [
-            item("Sobre o zread", #selector(showAbout(_:))),
+            item("About zread", #selector(showAbout(_:))),
             .separator(),
-            item("Ajustes…", #selector(WindowController.showSettings(_:)), ","),
-            item("Instalar comando zread", #selector(installCommand(_:))),
+            item("Settings…", #selector(WindowController.showSettings(_:)), ","),
+            item("Install zread Command", #selector(installCommand(_:))),
             .separator(),
-            item("Ocultar zread", #selector(NSApplication.hide(_:)), "h"),
-            item("Encerrar zread", #selector(NSApplication.terminate(_:)), "q"),
+            item("Hide zread", #selector(NSApplication.hide(_:)), "h"),
+            item("Quit zread", #selector(NSApplication.terminate(_:)), "q"),
         ])
-        add(to: main, "Arquivo", [
-            item("Abrir pasta ou arquivo…", #selector(openDocument(_:)), "o"),
-            item("Salvar", #selector(WindowController.saveDocument(_:)), "s"),
+        add(to: main, "File", [
+            item("Open Folder or File…", #selector(openDocument(_:)), "o"),
+            item("Save", #selector(WindowController.saveDocument(_:)), "s"),
             .separator(),
-            item("Fechar", #selector(NSWindow.performClose(_:)), "w"),
+            item("Close", #selector(NSWindow.performClose(_:)), "w"),
         ])
-        add(to: main, "Editar", [
-            item("Desfazer", Selector(("undo:")), "z"),
-            item("Refazer", Selector(("redo:")), "Z"),
+        add(to: main, "Edit", [
+            item("Undo", Selector(("undo:")), "z"),
+            item("Redo", Selector(("redo:")), "Z"),
             .separator(),
-            item("Recortar", #selector(NSText.cut(_:)), "x"),
-            item("Copiar", #selector(NSText.copy(_:)), "c"),
-            item("Colar", #selector(NSText.paste(_:)), "v"),
-            item("Selecionar tudo", #selector(NSText.selectAll(_:)), "a"),
+            item("Cut", #selector(NSText.cut(_:)), "x"),
+            item("Copy", #selector(NSText.copy(_:)), "c"),
+            item("Paste", #selector(NSText.paste(_:)), "v"),
+            item("Select All", #selector(NSText.selectAll(_:)), "a"),
         ])
-        add(to: main, "Visualizar", [
-            item("Alternar leitura e fonte", #selector(WindowController.toggleSource(_:)), "e"),
-            item("Mostrar ou ocultar menu lateral", #selector(WindowController.toggleSidebar(_:)), "\\"),
+        add(to: main, "View", [
+            item("Toggle Reading and Source", #selector(WindowController.toggleSource(_:)), "e"),
+            item("Show or Hide Sidebar", #selector(WindowController.toggleSidebar(_:)), "\\"),
             .separator(),
-            item("Tela cheia", #selector(NSWindow.toggleFullScreen(_:)), "f"),
+            item("Toggle Full Screen", #selector(NSWindow.toggleFullScreen(_:)), "f"),
         ])
-        let window = add(to: main, "Janela", [
-            item("Minimizar", #selector(NSWindow.performMiniaturize(_:)), "m"),
+        let window = add(to: main, "Window", [
+            item("Minimize", #selector(NSWindow.performMiniaturize(_:)), "m"),
         ])
         NSApp.windowsMenu = window
         return main

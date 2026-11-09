@@ -8,509 +8,514 @@
 
 ## Overview
 
-zread é um app para macOS que abre uma pasta de projeto pelo terminal
-(`zread .`) e mostra os arquivos Markdown dela como artigos para ler. A tela
-padrão é o texto renderizado em uma coluna, com tipografia e componentes
-inspirados na leitura do Medium. Editar existe, mas é secundário: um atalho
-troca a tela para o texto cru, e outro salva.
+zread is a macOS app that opens a project folder from the terminal
+(`zread .`) and shows its Markdown files as articles to read. The default
+screen is the rendered text in a single column, with typography and components
+inspired by reading on Medium. Editing exists but is secondary: one shortcut
+switches the screen to the raw text, and another saves.
 
-A relação com o Zed é invertida. O Zed abre em código e pode mostrar um preview.
-O zread abre na leitura e pode mostrar o código fonte do Markdown.
+The relationship with Zed is inverted. Zed opens on code and can show a preview.
+zread opens on reading and can show the Markdown source.
 
 ## The Problem
 
-Markdown de repositório (README, `docs/`, design docs) é lido hoje dentro de
-editores de código. Nesses editores o preview é um painel secundário: a
-tipografia não foi pensada para texto longo, e árvore, abas e demais controles
-do editor ficam em volta do texto.
+Repository Markdown (README, `docs/`, design docs) is read today inside code
+editors. In those editors the preview is a secondary panel: the typography was
+not designed for long text, and the tree, tabs, and other editor controls
+surround the text.
 
-Ajustar isso dentro do editor resolve só uma parte. O VS Code aceita CSS próprio
-no preview (`markdown.styles`), o que melhora a tipografia, mas o preview
-continua sendo um painel dentro de um editor. O zread só se justifica pelo que
-um tema não entrega: uma janela feita só para ler, aberta direto do terminal, em
-que o texto renderizado é a tela inicial.
+Adjusting this inside the editor solves only part of it. VS Code accepts custom
+CSS in the preview (`markdown.styles`), which improves the typography, but the
+preview is still a panel inside an editor. zread is justified only by what a
+theme cannot deliver: a window made only for reading, opened directly from the
+terminal, in which the rendered text is the initial screen.
 
-Critério de corte para todo o projeto: **feature que não melhora a leitura de
-Markdown de repositório fica fora.** A edição entra como exceção declarada, para
-corrigir o que se percebe durante a leitura.
+Cut criterion for the whole project: **a feature that does not improve reading
+repository Markdown stays out.** Editing is included as a declared exception, to
+fix what is noticed during reading.
 
 ## Goals
 
-**Abertura**
+**Opening**
 
-*   `zread .` abre a pasta atual, e `zread caminho/arquivo.md` abre direto
-    naquele arquivo.
-*   Ao abrir uma pasta, o primeiro arquivo mostrado é o `README.md` da raiz. Sem
-    README, a tela mostra a árvore de arquivos.
+*   `zread .` opens the current folder, and `zread caminho/arquivo.md` opens
+    directly on that file.
+*   When opening a folder, the first file shown is the root `README.md`. Without
+    a README, the screen shows the file tree.
 
-**Leitura**
+**Reading**
 
-*   O modo leitura é sempre o modo inicial, para todo arquivo aberto.
-*   O texto fica em uma coluna central de largura limitada, em torno de 680 px.
-*   Tabelas e blocos de código largos não quebram a coluna do texto: rolam na
-    horizontal dentro do próprio bloco.
-*   Componentes renderizados: título, subtítulo, parágrafo, citação, lista,
-    imagem, link, tabela, bloco de código com destaque de sintaxe, código
-    inline, separador e task list.
-*   Interface mínima: menu lateral recolhível por um botão na barra de título,
-    com a árvore de arquivos e os ajustes. Nada de abas ou barra de ferramentas.
+*   Reading mode is always the initial mode, for every opened file.
+*   The text sits in a central column of limited width, around 680 px.
+*   Wide tables and code blocks do not break the text column: they scroll
+    horizontally inside the block itself.
+*   Rendered components: title, subtitle, paragraph, quote, list, image, link,
+    table, code block with syntax highlighting, inline code, separator, and task
+    list.
+*   Minimal interface: a sidebar collapsible by a button in the title bar, with
+    the file tree and the settings. No tabs or toolbar.
 
-**Navegação no repositório**
+**Repository navigation**
 
-*   A árvore lista só as pastas que contêm Markdown.
-*   Pastas `.git`, `node_modules` e as listadas no `.gitignore` não aparecem.
-*   Link relativo entre arquivos Markdown abre o destino dentro do zread.
-    Âncoras (`#secao`) rolam até o título. Link externo abre no navegador padrão.
-*   Imagem com caminho relativo é carregada do repositório.
+*   The tree lists only the folders that contain Markdown.
+*   `.git`, `node_modules`, and folders listed in `.gitignore` do not appear.
+*   A relative link between Markdown files opens the target inside zread.
+    Anchors (`#secao`) scroll to the heading. An external link opens in the
+    default browser.
+*   An image with a relative path is loaded from the repository.
 
-**Edição (secundária)**
+**Editing (secondary)**
 
-*   `Cmd+E` alterna entre leitura e texto cru. `Cmd+S` salva.
-*   Ao alternar, a tela mantém o trecho que estava sendo lido, nos dois sentidos.
-*   Nenhuma alteração não salva é perdida sem aviso, ao trocar de arquivo ou
-    fechar a janela.
+*   `Cmd+E` switches between reading and raw text. `Cmd+S` saves.
+*   When switching, the screen keeps the passage being read, in both directions.
+*   No unsaved change is lost without a warning, when switching files or closing
+    the window.
 
-**Tema**
+**Theme**
 
-*   Modo claro: fundo Cloud Dancer (PANTONE 11-4201, `#F0EEE9`) com texto quase
-    preto.
-*   Modo escuro: fundo bem escuro, próximo do preto, com texto branco.
-*   O tema acompanha a aparência do macOS.
-*   Corpo em Source Serif Pro, embarcada no app (licença SIL OFL). Títulos e
-    interface em Helvetica Neue, do sistema. Código sempre em Menlo.
-*   Ajustes de leitura no menu lateral, aplicados na hora e guardados entre
-    sessões: fonte (serifada ou monoespaçada), tamanho, espaço entre letras, altura
-    da linha e cor primária, usada em títulos, links, citações e separadores.
+*   Light mode: Cloud Dancer background (PANTONE 11-4201, `#F0EEE9`) with
+    near-black text.
+*   Dark mode: very dark background, close to black, with white text.
+*   The theme follows the macOS appearance by default, and can be set to light or dark in the settings.
+*   Body in Source Serif Pro, embedded in the app (SIL OFL license). Headings and
+    interface in Helvetica Neue, from the system. Code always in Menlo.
+*   Reading settings in the sidebar, applied immediately and kept between
+    sessions: font (Serif or monospaced), size, letter spacing, line height, and
+    primary color, used in headings, links, quotes, and separators.
 
-**Leveza (metas propostas, ainda não medidas)**
+**Lightness (proposed targets, not yet measured)**
 
-*   Do Enter em `zread .` até o texto na tela: até 500 ms em Apple Silicon, com o
-    app fechado.
-*   App instalado: até 30 MB.
-*   Memória com um documento aberto: até 200 MB, somando todos os processos do
-    app.
+*   From Enter on `zread .` to text on screen: up to 500 ms on Apple Silicon,
+    with the app closed.
+*   Installed app: up to 30 MB.
+*   Memory with one document open: up to 200 MB, adding up all the app's
+    processes.
 
 ## Non-Goals
 
-*   Ser editor de código, ou abrir arquivos que não sejam Markdown.
-*   Edição WYSIWYG ou por bloco.
-*   Vault de notas: wikilinks, backlinks, grafo, tags.
-*   Busca em todo o repositório na primeira versão.
-*   Abas ou vários documentos lado a lado.
-*   Temas configuráveis além dos ajustes de leitura listados nos Goals.
-*   Plugins, sincronização, publicação ou exportação.
-*   Windows e Linux.
-*   Renderizar Mermaid ou matemática na primeira versão.
-*   Reproduzir a marca do Medium: logo, nome, e recursos sociais como aplausos,
-    comentários e perfil. A referência é só a experiência de leitura.
+*   Being a code editor, or opening files that are not Markdown.
+*   WYSIWYG or block-based editing.
+*   Notes vault: wikilinks, backlinks, graph, tags.
+*   Search across the whole repository in the first version.
+*   Tabs or multiple documents side by side.
+*   Configurable themes beyond the reading settings listed in the Goals.
+*   Plugins, sync, publishing, or export.
+*   Windows and Linux.
+*   Rendering Mermaid or math in the first version.
+*   Reproducing the Medium brand: logo, name, and social features such as claps,
+    comments, and profile. The reference is only the reading experience.
 
 ## Open Questions
 
-Nenhuma em aberto. Decisões tomadas durante a redação:
+None open. Decisions made during drafting:
 
-*   **Fonte de título**: Helvetica Neue. A Söhne, associada ao Medium, é
-    licenciada e não está nesta máquina.
-*   **Modo escuro**: fundo `#0A0A0A`, texto `#FFFFFF`, a pedido do autor. Branco
-    puro em texto longo pode ofuscar. Os valores ficam em variáveis CSS, e o
-    teste de leitura real pode ajustá-los.
-*   **Mudança no disco**: ao focar a janela, o app compara a data de modificação
-    e recarrega mantendo o trecho. Com edição não salva, não recarrega. `Cmd+S`
-    pede confirmação se o arquivo mudou no disco.
-*   **Mermaid e matemática**: fora da v1. O bloco aparece como código.
-*   **Arquivo muito grande**: acima de 2 MB, renderiza sem destaque de sintaxe, e
-    as metas de abertura deixam de valer.
+*   **Heading font**: Helvetica Neue. Söhne, associated with Medium, is licensed
+    and is not on this machine.
+*   **Dark mode**: background `#0A0A0A`, text `#FFFFFF`, at the author's request.
+    Pure white in long text can cause glare. The values live in CSS variables,
+    and real reading tests can adjust them.
+*   **Change on disk**: when the window gains focus, the app compares the
+    modification date and reloads, keeping the passage. With an unsaved edit, it
+    does not reload. `Cmd+S` asks for confirmation if the file changed on disk.
+*   **Mermaid and math**: out of v1. The block appears as code.
+*   **Very large file**: above 2 MB, it renders without syntax highlighting, and
+    the opening targets no longer apply.
 
 ## Critical User Journeys (CUJs)
 
-### CUJ 1: Ler os docs de um projeto
+### CUJ 1: Read a project's docs
 
-*   **Given**: um terminal em uma pasta de repositório com `README.md` e `docs/`.
-*   **When**: o usuário executa `zread .` e clica em um link relativo no README.
-*   **Then**: o README aparece em modo leitura, e o documento apontado abre na
-    mesma janela, também em modo leitura.
+*   **Given**: a terminal in a repository folder with `README.md` and `docs/`.
+*   **When**: the user runs `zread .` and clicks a relative link in the README.
+*   **Then**: the README appears in reading mode, and the linked document opens
+    in the same window, also in reading mode.
 
-### CUJ 2: Corrigir um erro durante a leitura
+### CUJ 2: Fix an error while reading
 
-*   **Given**: um documento aberto em modo leitura, rolado até o meio.
-*   **When**: o usuário tecla `Cmd+E`, corrige o texto, tecla `Cmd+S` e `Cmd+E`.
-*   **Then**: o arquivo em disco contém a correção, e a leitura volta ao mesmo
-    trecho já com o texto corrigido.
+*   **Given**: a document open in reading mode, scrolled to the middle.
+*   **When**: the user presses `Cmd+E`, fixes the text, presses `Cmd+S` and
+    `Cmd+E`.
+*   **Then**: the file on disk contains the fix, and reading returns to the same
+    passage with the corrected text.
 
-### CUJ 3: Ler à noite
+### CUJ 3: Read at night
 
-*   **Given**: o macOS em aparência escura.
-*   **When**: o usuário abre qualquer documento.
-*   **Then**: o documento aparece com fundo bem escuro e texto branco, sem ajuste
-    manual.
+*   **Given**: macOS in dark appearance.
+*   **When**: the user opens any document.
+*   **Then**: the document appears with a very dark background and white text,
+    with no manual adjustment.
 
 ## Technical Plan (Architecture)
 
-zread é um app AppKit em Swift, sem sandbox, distribuído fora da App Store. Ele
-converte Markdown em HTML com cmark-gfm e mostra o resultado em uma única
-`WKWebView`. O modo fonte é um `NSTextView` de texto simples, colocado no lugar
-da WebView.
+zread is an AppKit app in Swift, without a sandbox, distributed outside the App
+Store. It converts Markdown to HTML with cmark-gfm and shows the result in a
+single `WKWebView`. Source mode is a plain text `NSTextView`, placed where the
+WebView was.
 
 ```text
 terminal: zread .
    |
    v
-CLI (zread)  -- caminho absoluto -->  open -b <bundle id> <caminho>
+CLI (zread)  -- absolute path -->  open -b <bundle id> <path>
                                          |
                                          v
                               AppDelegate / WindowController
-                              (uma janela por raiz aberta)
+                              (one window per open root)
                                  |                    |
-                     1. documento inicial     2. depois do primeiro texto
+                     1. initial document     2. after the first text
                                  v                    v
                          MarkdownRenderer        RepoScanner
-                          (cmark-gfm)        (git ls-files ou varredura)
+                          (cmark-gfm)        (git ls-files or scan)
                                  |                    |
                                  v                    v
                          ReaderView (WKWebView)   FileTree (sidebar)
                           |            ^
-          clique em link  |            | zread:// (imagens, CSS, JS)
+              link click  |            | zread:// (images, CSS, JS)
                           v            |
-                     LinkRouter    LocalScheme (só dentro da raiz)
+                     LinkRouter    LocalScheme (only inside the root)
 
-Cmd+E:  ReaderView <--> SourceEditor (NSTextView), trocando número de linha
-Cmd+S:  SourceEditor --> grava no disco --> MarkdownRenderer --> ReaderView
+Cmd+E:  ReaderView <--> SourceEditor (NSTextView), exchanging line number
+Cmd+S:  SourceEditor --> writes to disk --> MarkdownRenderer --> ReaderView
 ```
 
-### Linha de base medida
+### Measured baseline
 
-Um protótipo descartável (janela AppKit, uma `WKWebView`, 400 seções de HTML
-sintético, sem parser) foi executado 5 vezes em 2026-11-08:
+A throwaway prototype (AppKit window, one `WKWebView`, 400 sections of synthetic
+HTML, no parser) was run 5 times on 2026-11-08:
 
-| Item | Resultado |
+| Item | Result |
 | --- | --- |
-| Texto carregado, execuções 2 a 5 | 226 a 265 ms |
-| Texto carregado, primeira execução | 1.624 ms |
-| Memória somada (app + processos WebKit) | 175 a 176 MB |
-| Binário | 109 KB |
-| Ghostty, para comparação | 62 MB em disco, 153 MB rodando com sessões abertas |
-| Zed, para comparação | 176 MB em disco, memória não medida |
+| Text loaded, runs 2 to 5 | 226 to 265 ms |
+| Text loaded, first run | 1,624 ms |
+| Combined memory (app + WebKit processes) | 175 to 176 MB |
+| Binary | 109 KB |
+| Ghostty, for comparison | 62 MB on disk, 153 MB running with open sessions |
+| Zed, for comparison | 176 MB on disk, memory not measured |
 
-A memória soma RSS, que conta páginas compartilhadas do sistema mais de uma vez,
-então o valor real é menor. Restam cerca de 25 MB até a meta de 200 MB antes de
-somar parser, CSS e imagens. A meta de 500 ms vale para abertura com o WebKit já
-em cache de disco. A primeira execução depois de um boot pode passar dela.
+The memory figure adds up RSS, which counts shared system pages more than once,
+so the real value is lower. About 25 MB remain up to the 200 MB target before
+adding the parser, CSS, and images. The 500 ms target applies to opening with
+WebKit already in the disk cache. The first run after a boot can exceed it.
 
-### Componentes
+### Components
 
-*   **CLI `zread`**: binário pequeno dentro do bundle. Resolve o argumento para
-    caminho absoluto e pede ao macOS para abrir o app com ele, via `open -b`.
-    Repetir o comando com o app aberto reaproveita a instância em execução. O
-    comando chega ao `PATH` por symlink em `/usr/local/bin`, criado por um item
-    de menu do app.
-*   **WindowController**: uma janela por pasta raiz. Reabrir a mesma raiz traz a
-    janela existente para a frente.
-*   **MarkdownRenderer**: chama cmark-gfm com as extensões de tabela, task list,
-    strikethrough e autolink, e com a opção de posição de origem, que grava a
-    linha de cada bloco em `data-sourcepos`. Entrega um fragmento HTML.
-*   **ReaderView**: reaproveita a mesma `WKWebView`, trocando só o conteúdo. A
-    casca de página, o CSS e o JS vêm do bundle.
-*   **Tema**: um CSS com variáveis de cor, trocadas por
-    `prefers-color-scheme`. Fontes do sistema, nenhuma embarcada.
-*   **Destaque de sintaxe**: highlight.js embarcado, com linguagens comuns,
-    carregado só quando o documento tem bloco de código.
-*   **RepoScanner**: em repositório git, usa `git ls-files -co
-    --exclude-standard` filtrando `*.md` e `*.markdown`, o que já respeita o
-    `.gitignore`. Fora de git, percorre a pasta ignorando `.git` e
-    `node_modules`. Roda depois do primeiro texto, para não atrasar a abertura.
-*   **LocalScheme**: `WKURLSchemeHandler` para `zread://`. Serve imagens
-    relativas à raiz e recusa qualquer caminho que, resolvido, saia dela.
-*   **LinkRouter**: decide cada navegação da WebView. Arquivo Markdown dentro da
-    raiz abre no zread, `#ancora` rola na página, e `http(s)` e `mailto` vão para
-    o sistema.
-*   **SourceEditor**: `NSTextView` em texto simples, Menlo, sem destaque. Guarda
-    o estado de alteração não salva e pede confirmação ao trocar de arquivo ou
-    fechar.
+*   **`zread` CLI**: small binary inside the bundle. Resolves the argument to an
+    absolute path and asks macOS to open the app with it, via `open -b`.
+    Repeating the command with the app open reuses the running instance. The
+    command reaches the `PATH` through a symlink in `/usr/local/bin`, created by
+    an app menu item.
+*   **WindowController**: one window per root folder. Reopening the same root
+    brings the existing window to the front.
+*   **MarkdownRenderer**: calls cmark-gfm with the table, task list,
+    strikethrough, and autolink extensions, and with the source position option,
+    which records each block's line in `data-sourcepos`. Delivers an HTML
+    fragment.
+*   **ReaderView**: reuses the same `WKWebView`, swapping only the content. The
+    page shell, CSS, and JS come from the bundle.
+*   **Theme**: a CSS file with color variables, switched by
+    `prefers-color-scheme`. System fonts, none embedded.
+*   **Syntax highlighting**: embedded highlight.js, with common languages, loaded
+    only when the document has a code block.
+*   **RepoScanner**: in a git repository, uses `git ls-files -co
+    --exclude-standard` filtering `*.md` and `*.markdown`, which already respects
+    `.gitignore`. Outside git, walks the folder ignoring `.git` and
+    `node_modules`. Runs after the first text, so as not to delay opening.
+*   **LocalScheme**: `WKURLSchemeHandler` for `zread://`. Serves images relative
+    to the root and refuses any path that, once resolved, leaves it.
+*   **LinkRouter**: decides each WebView navigation. A Markdown file inside the
+    root opens in zread, `#ancora` scrolls within the page, and `http(s)` and
+    `mailto` go to the system.
+*   **SourceEditor**: plain text `NSTextView`, Menlo, no highlighting. Keeps the
+    unsaved change state and asks for confirmation when switching files or
+    closing.
 
-### Alternância mantendo o trecho
+### Switching while keeping the passage
 
-*   **Leitura para fonte**: um script acha o primeiro bloco visível, lê a linha
-    em `data-sourcepos` e o `NSTextView` rola até essa linha.
-*   **Fonte para leitura**: o app pega a primeira linha visível, renderiza de
-    novo se houve mudança, e o script rola até o último bloco cuja linha inicial
-    é menor ou igual a ela.
+*   **Reading to source**: a script finds the first visible block, reads the
+    line in `data-sourcepos`, and the `NSTextView` scrolls to that line.
+*   **Source to reading**: the app takes the first visible line, renders again
+    if there was a change, and the script scrolls to the last block whose
+    starting line is less than or equal to it.
 
-A precisão é por bloco. Um parágrafo longo volta ao seu início, não à frase
-exata.
+Precision is per block. A long paragraph returns to its start, not to the exact
+sentence.
 
-### Segurança
+### Security
 
-Arquivos de um repositório clonado são conteúdo não confiável, e o app não tem
-sandbox. Por isso:
+Files from a cloned repository are untrusted content, and the app has no
+sandbox. Therefore:
 
-*   HTML cru dentro do Markdown é descartado, que é o modo padrão do cmark. O
-    custo é real: READMEs com `<img>` de largura definida, `<details>` ou
-    alinhamento em HTML perdem esses elementos.
-*   Uma Content-Security-Policy permite script, estilo e imagem apenas de
-    `zread://`. Imagens remotas ficam bloqueadas, o que evita que abrir um
-    documento avise um servidor externo, e também significa que badges de README
-    não aparecem.
-*   `LocalScheme` restringe a leitura à raiz aberta.
+*   Raw HTML inside Markdown is discarded, which is cmark's default mode. The
+    cost is real: READMEs with `<img>` of defined width, `<details>`, or HTML
+    alignment lose those elements.
+*   A Content-Security-Policy allows script, style, and image only from
+    `zread://`. Remote images are blocked, which prevents opening a document from
+    notifying an external server, and also means README badges do not appear.
+*   `LocalScheme` restricts reading to the open root.
 
 ## Alternatives Considered
 
-Não houve brief prévio. Estas alternativas vieram da discussão durante a
-redação. Apenas a WKWebView foi medida. Os demais números são estimativas.
+There was no prior brief. These alternatives came from discussion during
+drafting. Only WKWebView was measured. The other numbers are estimates.
 
-### Alternativa A: Tema CSS no preview de um editor existente
+### Alternative A: CSS theme in an existing editor's preview
 
-*   **Pros**: quase nenhum código. O VS Code aceita CSS próprio pela configuração
-    `markdown.styles`.
-*   **Cons**: o preview continua sendo um painel dentro de um editor, e não abre
-    direto em leitura pelo terminal.
-*   **Reason for Rejection**: Rejected by author: a dor escolhida é o preview ser
-    secundário dentro de um editor, e um tema muda só a tipografia.
+*   **Pros**: almost no code. VS Code accepts custom CSS through the
+    `markdown.styles` setting.
+*   **Cons**: the preview is still a panel inside an editor, and it does not open
+    directly in reading from the terminal.
+*   **Reason for Rejection**: Rejected by author: the chosen pain is the preview
+    being secondary inside an editor, and a theme changes only the typography.
 
-### Alternativa B: Nativo com TextKit, sem WebView
+### Alternative B: Native with TextKit, no WebView
 
-*   **Pros**: elimina os processos WebKit, cerca de 76 MB medidos no protótipo.
-    App estimado entre 3 e 8 MB.
-*   **Cons**: tabela, bloco de código com rolagem própria e imagem exigem views
-    embutidas feitas à mão, e cada componente vira código próprio.
-*   **Reason for Rejection**: Rejected by author: a WKWebView mediu 175 MB, na
-    faixa dos 153 MB do Ghostty em uso, e entrega os componentes por CSS. A
-    economia de memória não paga o trabalho por componente.
+*   **Pros**: eliminates the WebKit processes, about 76 MB measured in the
+    prototype. App estimated at 3 to 8 MB.
+*   **Cons**: tables, code blocks with their own scrolling, and images require
+    handmade embedded views, and each component becomes its own code.
+*   **Reason for Rejection**: Rejected by author: WKWebView measured 175 MB, in
+    the range of Ghostty's 153 MB in use, and delivers the components through
+    CSS. The memory savings do not pay for the per-component work.
 
-### Alternativa C: GPUI, o framework de interface do Zed
+### Alternative C: GPUI, Zed's interface framework
 
-*   **Pros**: mesma técnica do Zed, desenho direto na GPU, sem WebView.
-*   **Cons**: todos os componentes de leitura, seleção de texto e imagens seriam
-    escritos do zero, sobre uma dependência sujeita a mudança de API. Não medido.
-*   **Reason for Rejection**: Rejected by author: o renderizador do Zed é feito
-    para editar código, e a leitura deste produto não precisa dele.
+*   **Pros**: same technique as Zed, direct drawing on the GPU, no WebView.
+*   **Cons**: all reading components, text selection, and images would be written
+    from scratch, on top of a dependency subject to API changes. Not measured.
+*   **Reason for Rejection**: Rejected by author: Zed's renderer is made for
+    editing code, and this product's reading does not need it.
 
-### Alternativa D: Tauri (Rust com WebView do sistema)
+### Alternative D: Tauri (Rust with the system WebView)
 
-*   **Pros**: ecossistema Rust, app estimado entre 10 e 15 MB.
-*   **Cons**: usa a mesma WebView, então não reduz memória, e acrescenta uma
-    ponte Rust/JS e custo no início.
-*   **Reason for Rejection**: retirada da lista de opções durante a redação, antes
-    da escolha final do autor: tem o custo da WKWebView e mais uma camada, sem
-    ganho em leveza.
+*   **Pros**: Rust ecosystem, app estimated at 10 to 15 MB.
+*   **Cons**: uses the same WebView, so it does not reduce memory, and adds a
+    Rust/JS bridge and startup cost.
+*   **Reason for Rejection**: removed from the list of options during drafting,
+    before the author's final choice: it has the cost of WKWebView plus one more
+    layer, with no gain in lightness.
 
-### Alternativa E: Electron
+### Alternative E: Electron
 
-*   **Pros**: ecossistema web completo e Chromium previsível.
-*   **Cons**: embarca um navegador inteiro no app.
-*   **Reason for Rejection**: não chegou a ser opção: incompatível com a meta de
-    até 30 MB aprovada pelo autor.
+*   **Pros**: complete web ecosystem and predictable Chromium.
+*   **Cons**: embeds an entire browser in the app.
+*   **Reason for Rejection**: never became an option: incompatible with the
+    target of up to 30 MB approved by the author.
 
-### Alternativa F: Edição por bloco
+### Alternative F: Block-based editing
 
-*   **Pros**: corrige um trecho sem sair do ponto de leitura.
-*   **Cons**: o parser precisa mapear bloco para linhas do arquivo, e limites de
-    bloco são ambíguos em lista aninhada e tabela.
-*   **Reason for Rejection**: Rejected by author: edição é secundária, e o modo
-    alternado mantém a leitura separada e simples.
+*   **Pros**: fixes a passage without leaving the reading position.
+*   **Cons**: the parser needs to map blocks to file lines, and block boundaries
+    are ambiguous in nested lists and tables.
+*   **Reason for Rejection**: Rejected by author: editing is secondary, and the
+    switched mode keeps reading separate and simple.
 
-### Alternativa G: WYSIWYG
+### Alternative G: WYSIWYG
 
-*   **Pros**: o usuário nunca vê sintaxe de Markdown.
-*   **Cons**: exige um motor de edição completo, e serializar de volta pode
-    reformatar o arquivo, gerando diff de ruído no repositório.
-*   **Reason for Rejection**: Rejected by author: mesmo motivo da Alternativa F,
-    somado ao peso contra a meta de leveza.
+*   **Pros**: the user never sees Markdown syntax.
+*   **Cons**: requires a complete editing engine, and serializing back can
+    reformat the file, producing noise diffs in the repository.
+*   **Reason for Rejection**: Rejected by author: same reason as Alternative F,
+    plus the weight against the lightness target.
 
-### Alternativa H: Escopo de vault de notas ou de arquivo único
+### Alternative H: Notes vault or single-file scope
 
-*   **Pros**: vault atenderia notas pessoais, e arquivo único seria o app mais
-    simples possível.
-*   **Cons**: vault exige índice e wikilinks e compete com o Obsidian. Arquivo
-    único perde a navegação entre documentos.
-*   **Reason for Rejection**: Rejected by author: o cenário escolhido é ler docs
-    de repositório.
+*   **Pros**: a vault would serve personal notes, and a single file would be the
+    simplest possible app.
+*   **Cons**: a vault requires an index and wikilinks and competes with Obsidian.
+    A single file loses navigation between documents.
+*   **Reason for Rejection**: Rejected by author: the chosen scenario is reading
+    repository docs.
 
 --------------------------------------------------------------------------------
 
 ## Detailed Implementation Plan
 
-Projeto novo: o diretório está vazio e não é repositório git. Todos os arquivos
-são criados. Requisitos: macOS 14 ou superior, Swift Package Manager, bundle id
-`com.pierryborges.zread`, app sem sandbox. Única dependência externa de código:
-`swift-cmark` (branch `gfm`, de `swiftlang/swift-cmark`).
+New project: the directory is empty and is not a git repository. All files are
+created. Requirements: macOS 14 or later, Swift Package Manager, bundle id
+`com.pierryborges.zread`, app without a sandbox. Only external code dependency:
+`swift-cmark` (`gfm` branch, from `swiftlang/swift-cmark`).
 
 ### Target Files to Create/Modify
 
 #### 1. `./Package.swift` (Create)
 
 *   **Type / Scope**: Build.
-*   **Proposed Changes**: Alvos executáveis `ZreadApp` e `zread-cli`, alvo de
-    biblioteca `ZreadCore` para a lógica testável, alvo de teste, e dependência
-    em `swift-cmark`. Separar `ZreadCore` permite testar sem abrir janela.
+*   **Proposed Changes**: Executable targets `ZreadApp` and `zread-cli`, library
+    target `ZreadCore` for the testable logic, test target, and a dependency on
+    `swift-cmark`. Separating `ZreadCore` allows testing without opening a
+    window.
 
 #### 2. `./Sources/ZreadCore/MarkdownRenderer.swift` (Create)
 
-*   **Type / Scope**: Biblioteca.
-*   **Proposed Changes**: `render(markdown: String) -> RenderedDocument`, com o
-    HTML e a informação `hasCode`. Usa cmark-gfm com tabela, task list,
-    strikethrough, autolink e posição de origem. Sem a opção unsafe, para
-    descartar HTML cru. Reescreve `src` de imagens relativas para `zread://`.
+*   **Type / Scope**: Library.
+*   **Proposed Changes**: `render(markdown: String) -> RenderedDocument`, with
+    the HTML and the `hasCode` information. Uses cmark-gfm with table, task list,
+    strikethrough, autolink, and source position. Without the unsafe option, to
+    discard raw HTML. Rewrites `src` of relative images to `zread://`.
 
 #### 3. `./Sources/ZreadCore/RepoScanner.swift` (Create)
 
-*   **Type / Scope**: Biblioteca.
-*   **Proposed Changes**: `scan(root: URL) async -> [FileNode]`. Com `.git` na
-    raiz, roda `git ls-files -co --exclude-standard`. Sem git ou com falha do
-    comando, percorre a pasta ignorando `.git` e `node_modules`. Filtra `.md` e
-    `.markdown`, e devolve árvore só com pastas que contêm esses arquivos.
+*   **Type / Scope**: Library.
+*   **Proposed Changes**: `scan(root: URL) async -> [FileNode]`. With `.git` in
+    the root, runs `git ls-files -co --exclude-standard`. Without git or if the
+    command fails, walks the folder ignoring `.git` and `node_modules`. Filters
+    `.md` and `.markdown`, and returns a tree with only the folders that contain
+    those files.
 
 #### 4. `./Sources/ZreadCore/RootResolver.swift` (Create)
 
-*   **Type / Scope**: Biblioteca.
-*   **Proposed Changes**: A partir do argumento, devolve `root` e arquivo
-    inicial. Pasta: é a raiz, com `README.md` como inicial, se existir. Arquivo:
-    sobe até achar `.git`, ou usa a pasta do arquivo como raiz.
+*   **Type / Scope**: Library.
+*   **Proposed Changes**: From the argument, returns `root` and the initial file.
+    Folder: it is the root, with `README.md` as the initial file, if it exists.
+    File: walks up until it finds `.git`, or uses the file's folder as the root.
 
 #### 5. `./Sources/ZreadCore/PathGuard.swift` (Create)
 
-*   **Type / Scope**: Biblioteca, segurança.
-*   **Proposed Changes**: `resolve(request:, root:) -> URL?`. Resolve symlinks e
-    `..`, e devolve nulo se o resultado sair da raiz. Usado por `LocalScheme` e
-    `LinkRouter`.
+*   **Type / Scope**: Library, security.
+*   **Proposed Changes**: `resolve(request:, root:) -> URL?`. Resolves symlinks
+    and `..`, and returns nil if the result leaves the root. Used by
+    `LocalScheme` and `LinkRouter`.
 
 #### 6. `./Sources/ZreadCore/LinkClassifier.swift` (Create)
 
-*   **Type / Scope**: Biblioteca.
-*   **Proposed Changes**: Classifica link em `internalMarkdown`, `anchor`,
-    `external` ou `blocked`, sem depender de AppKit. Só `http`, `https` e
-    `mailto` são externos.
+*   **Type / Scope**: Library.
+*   **Proposed Changes**: Classifies a link as `internalMarkdown`, `anchor`,
+    `external`, or `blocked`, without depending on AppKit. Only `http`, `https`,
+    and `mailto` are external.
 
 #### 7. `./Sources/ZreadCore/DocumentSession.swift` (Create)
 
-*   **Type / Scope**: Biblioteca.
-*   **Proposed Changes**: Guarda caminho, texto, data de modificação carregada e
-    estado de alteração não salva. Expõe `load()`, `save()`, que sinaliza
-    conflito se o disco mudou, e `changedOnDisk()`. Salva por escrita atômica.
+*   **Type / Scope**: Library.
+*   **Proposed Changes**: Keeps the path, text, loaded modification date, and
+    unsaved change state. Exposes `load()`, `save()`, which signals a conflict if
+    the disk changed, and `changedOnDisk()`. Saves by atomic write.
 
-#### 8. `./Sources/ZreadApp/main.swift` e `./Sources/ZreadApp/AppDelegate.swift` (Create)
+#### 8. `./Sources/ZreadApp/main.swift` and `./Sources/ZreadApp/AppDelegate.swift` (Create)
 
 *   **Type / Scope**: App.
-*   **Proposed Changes**: Inicialização e `application(_:open:)`, que recebe os
-    caminhos e encaminha para a janela daquela raiz. Menu com `Cmd+E`, `Cmd+S` e
-    o item de instalar o comando. A checagem de disco é disparada ao focar.
+*   **Proposed Changes**: Startup and `application(_:open:)`, which receives the
+    paths and forwards them to the window for that root. Menu with `Cmd+E`,
+    `Cmd+S`, and the item to install the command. The disk check is triggered on
+    focus.
 
 #### 9. `./Sources/ZreadApp/WindowController.swift` (Create)
 
 *   **Type / Scope**: App.
-*   **Proposed Changes**: Uma janela por raiz. Monta sidebar recolhível, área de
-    conteúdo e a troca entre `ReaderView` e `SourceEditor`. Pede confirmação ao
-    fechar ou trocar de arquivo com alteração não salva.
+*   **Proposed Changes**: One window per root. Assembles the collapsible sidebar,
+    the content area, and the switch between `ReaderView` and `SourceEditor`.
+    Asks for confirmation when closing or switching files with an unsaved change.
 
 #### 10. `./Sources/ZreadApp/ReaderView.swift` (Create)
 
 *   **Type / Scope**: App.
-*   **Proposed Changes**: Embrulha a `WKWebView`. Carrega a casca uma vez e troca
-    o conteúdo por script. Expõe `topVisibleLine()` e `scrollTo(line:)`.
+*   **Proposed Changes**: Wraps the `WKWebView`. Loads the shell once and swaps
+    the content by script. Exposes `topVisibleLine()` and `scrollTo(line:)`.
 
 #### 11. `./Sources/ZreadApp/SourceEditor.swift` (Create)
 
 *   **Type / Scope**: App.
-*   **Proposed Changes**: `NSTextView` em texto simples com Menlo, sem
-    substituições automáticas de aspas ou traços. Expõe as mesmas operações de
-    linha do `ReaderView`.
+*   **Proposed Changes**: Plain text `NSTextView` with Menlo, without automatic
+    quote or dash substitutions. Exposes the same line operations as
+    `ReaderView`.
 
 #### 12. `./Sources/ZreadApp/FileTreeView.swift` (Create)
 
 *   **Type / Scope**: App.
-*   **Proposed Changes**: `NSOutlineView` alimentado pelo `RepoScanner`. Mostra a
-    árvore assim que a varredura termina, sem bloquear o primeiro texto.
+*   **Proposed Changes**: `NSOutlineView` fed by `RepoScanner`. Shows the tree as
+    soon as the scan finishes, without blocking the first text.
 
-#### 13. `./Sources/ZreadApp/LocalScheme.swift` e `./Sources/ZreadApp/LinkRouter.swift` (Create)
+#### 13. `./Sources/ZreadApp/LocalScheme.swift` and `./Sources/ZreadApp/LinkRouter.swift` (Create)
 
-*   **Type / Scope**: App, segurança.
-*   **Proposed Changes**: `LocalScheme` serve recursos do bundle e imagens da
-    raiz por `PathGuard`. `LinkRouter` aplica `LinkClassifier` em cada navegação
-    da WebView, e bloqueia as demais.
+*   **Type / Scope**: App, security.
+*   **Proposed Changes**: `LocalScheme` serves bundle resources and root images
+    through `PathGuard`. `LinkRouter` applies `LinkClassifier` to each WebView
+    navigation, and blocks the rest.
 
 #### 14. `./Sources/ZreadApp/CLIInstaller.swift` (Create)
 
 *   **Type / Scope**: App.
-*   **Proposed Changes**: Cria o symlink `/usr/local/bin/zread` para o binário do
-    bundle. Sem permissão, mostra o comando para o usuário rodar.
+*   **Proposed Changes**: Creates the symlink `/usr/local/bin/zread` to the
+    bundle's binary. Without permission, shows the command for the user to run.
 
 #### 15. `./Sources/zread-cli/main.swift` (Create)
 
 *   **Type / Scope**: CLI.
-*   **Proposed Changes**: Resolve o argumento (padrão `.`) para caminho absoluto
-    e chama `open -b com.pierryborges.zread`. Caminho inexistente gera erro em
-    stderr e saída 1.
+*   **Proposed Changes**: Resolves the argument (default `.`) to an absolute path
+    and calls `open -b com.pierryborges.zread`. A nonexistent path produces an
+    error on stderr and exit 1.
 
 #### 16. `./Resources/page.html` (Create)
 
 *   **Type / Scope**: Interface.
-*   **Proposed Changes**: Casca da página, com a Content-Security-Policy que só
-    permite `zread://`.
+*   **Proposed Changes**: Page shell, with the Content-Security-Policy that only
+    allows `zread://`.
 
 #### 17. `./Resources/reader.css` (Create)
 
 *   **Type / Scope**: Interface.
-*   **Proposed Changes**: Variáveis de cor para claro (`#F0EEE9`) e escuro
-    (`#0A0A0A` e `#FFFFFF`), coluna em torno de 680 px, Charter no corpo,
-    Helvetica Neue em títulos, Menlo em código. Estilos dos componentes listados
-    nos Goals, com rolagem horizontal própria em tabela e bloco de código.
+*   **Proposed Changes**: Color variables for light (`#F0EEE9`) and dark
+    (`#0A0A0A` and `#FFFFFF`), column around 680 px, Charter in the body,
+    Helvetica Neue in headings, Menlo in code. Styles for the components listed
+    in the Goals, with their own horizontal scrolling in tables and code blocks.
 
 #### 18. `./Resources/reader.js` (Create)
 
 *   **Type / Scope**: Interface.
-*   **Proposed Changes**: Trocar conteúdo, ler o primeiro bloco visível por
-    `data-sourcepos`, rolar até uma linha, gerar âncoras nos títulos e carregar o
-    destaque de sintaxe só quando `hasCode` for verdadeiro.
+*   **Proposed Changes**: Swap content, read the first visible block through
+    `data-sourcepos`, scroll to a line, generate anchors on headings, and load
+    syntax highlighting only when `hasCode` is true.
 
-#### 19. `./Resources/vendor/highlight.min.js` e `./Resources/vendor/highlight.css` (Create)
+#### 19. `./Resources/vendor/highlight.min.js` and `./Resources/vendor/highlight.css` (Create)
 
-*   **Type / Scope**: Dependência embarcada.
-*   **Proposed Changes**: Build de linguagens comuns do highlight.js, com versão
-    fixada e cores ajustadas aos dois temas. Sem acesso à rede em execução.
+*   **Type / Scope**: Embedded dependency.
+*   **Proposed Changes**: highlight.js build of common languages, with a pinned
+    version and colors adjusted to both themes. No network access at runtime.
 
 #### 20. `./Resources/Info.plist` (Create)
 
-*   **Type / Scope**: Configuração.
-*   **Proposed Changes**: Bundle id e tipos de documento para pasta e Markdown,
-    necessários para o macOS entregar os caminhos ao app.
+*   **Type / Scope**: Configuration.
+*   **Proposed Changes**: Bundle id and document types for folder and Markdown,
+    needed for macOS to deliver the paths to the app.
 
 #### 21. `./scripts/bundle.sh` (Create)
 
 *   **Type / Scope**: Build.
-*   **Proposed Changes**: Compila em release, monta `zread.app` com os dois
-    binários e `Resources`, e assina ad hoc.
+*   **Proposed Changes**: Compiles in release, assembles `zread.app` with the two
+    binaries and `Resources`, and signs ad hoc.
 
-#### 22. `./scripts/measure.sh` e `./Tests/fixtures/long.md` (Create)
+#### 22. `./scripts/measure.sh` and `./Tests/fixtures/long.md` (Create)
 
-*   **Type / Scope**: Medição.
-*   **Proposed Changes**: Executa o app com o documento de teste e registra tempo
-    até o texto, memória somada dos processos e tamanho do bundle, para comparar
-    com as metas.
+*   **Type / Scope**: Measurement.
+*   **Proposed Changes**: Runs the app with the test document and records time to
+    text, combined process memory, and bundle size, to compare with the targets.
 
 #### 23. `./Tests/ZreadCoreTests/*.swift` (Create)
 
-*   **Type / Scope**: Testes de unidade.
-*   **Proposed Changes**: Um arquivo por tipo de `ZreadCore`: HTML cru descartado
-    e `data-sourcepos` presente; `.gitignore` respeitado e fallback sem git;
-    raiz resolvida de pasta e de arquivo; caminho com `..` e symlink recusados;
-    classificação de cada tipo de link; conflito ao salvar.
+*   **Type / Scope**: Unit tests.
+*   **Proposed Changes**: One file per `ZreadCore` type: raw HTML discarded and
+    `data-sourcepos` present; `.gitignore` respected and fallback without git;
+    root resolved from folder and from file; path with `..` and symlink refused;
+    classification of each link type; conflict on save.
 
-#### 24. `./README.md` e `./.gitignore` (Create)
+#### 24. `./README.md` and `./.gitignore` (Create)
 
-*   **Type / Scope**: Documentação e repositório.
-*   **Proposed Changes**: Como compilar, instalar o comando e usar. Ignora
-    `.build` e o app gerado.
+*   **Type / Scope**: Documentation and repository.
+*   **Proposed Changes**: How to compile, install the command, and use it.
+    Ignores `.build` and the generated app.
 
 ### Verification Plan
 
-*   **Compilation/Build**: `swift build -c release` e `scripts/bundle.sh`.
+*   **Compilation/Build**: `swift build -c release` and `scripts/bundle.sh`.
 *   **Unit Tests**: `swift test`.
-*   **Static Analysis & Linting**: compilação sem warnings.
-*   **Test Coverage Requirement**: toda a lógica de `PathGuard`, `LinkClassifier`
-    e `DocumentSession.save`. Os demais tipos de `ZreadCore` pelos casos acima.
-*   **E2E/Integration**: executar os três CUJs à mão em um repositório real. Abrir
-    documento malicioso com `<script>`, imagem remota e link `../../` e confirmar
-    que nada executa, carrega ou sai da raiz.
-*   **Performance**: `scripts/measure.sh`, 5 execuções, com as metas de 500 ms,
-    30 MB e 200 MB. Registrar a primeira execução em separado.
+*   **Static Analysis & Linting**: compilation without warnings.
+*   **Test Coverage Requirement**: all the logic of `PathGuard`, `LinkClassifier`,
+    and `DocumentSession.save`. The other `ZreadCore` types through the cases
+    above.
+*   **E2E/Integration**: run the three CUJs by hand in a real repository. Open a
+    malicious document with `<script>`, a remote image, and a `../../` link and
+    confirm that nothing executes, loads, or leaves the root.
+*   **Performance**: `scripts/measure.sh`, 5 runs, with the targets of 500 ms,
+    30 MB, and 200 MB. Record the first run separately.
 
 --------------------------------------------------------------------------------
 

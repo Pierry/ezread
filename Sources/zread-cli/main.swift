@@ -7,7 +7,7 @@ func fail(_ message: String) -> Never {
 
 let argument = CommandLine.arguments.count > 1 ? CommandLine.arguments[1] : "."
 guard let resolved = realpath(argument, nil) else {
-    fail("caminho não encontrado: \(argument)")
+    fail("path not found: \(argument)")
 }
 let path = String(cString: resolved)
 free(resolved)
@@ -17,7 +17,7 @@ FileManager.default.fileExists(atPath: path, isDirectory: &isDirectory)
 if !isDirectory.boolValue {
     let ext = (path as NSString).pathExtension.lowercased()
     if ext != "md" && ext != "markdown" {
-        fail("não é um arquivo Markdown: \(argument)")
+        fail("not a Markdown file: \(argument)")
     }
 }
 
@@ -26,7 +26,7 @@ func enclosingAppPath() -> String {
     var size = UInt32(PATH_MAX)
     var buffer = [CChar](repeating: 0, count: Int(size))
     guard _NSGetExecutablePath(&buffer, &size) == 0, let real = realpath(buffer, nil) else {
-        fail("não consegui localizar o app")
+        fail("could not locate the app")
     }
     defer { free(real) }
     return URL(fileURLWithPath: String(cString: real))
@@ -43,8 +43,8 @@ do {
     try process.run()
     process.waitUntilExit()
 } catch {
-    fail("não consegui executar open: \(error.localizedDescription)")
+    fail("could not run open: \(error.localizedDescription)")
 }
 if process.terminationStatus != 0 {
-    fail("não consegui abrir o zread. O app está instalado?")
+    fail("could not open zread. Is the app installed?")
 }

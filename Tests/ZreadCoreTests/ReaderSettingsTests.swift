@@ -28,6 +28,21 @@ final class ReaderSettingsTests: XCTestCase {
         XCTAssertEqual(ReaderSettings.load(from: defaults), settings)
     }
 
+    func testAppearanceRoundTrip() {
+        var settings = ReaderSettings()
+        settings.appearance = .dark
+        settings.save(to: defaults)
+        XCTAssertEqual(ReaderSettings.load(from: defaults).appearance, .dark)
+    }
+
+    func testSettingsSavedBeforeAppearanceStillLoad() {
+        let old = #"{"fontSize":24,"fontStyle":"medium","letterSpacing":0,"lineHeight":1.8}"#
+        defaults.set(Data(old.utf8), forKey: "readerSettings")
+        let loaded = ReaderSettings.load(from: defaults)
+        XCTAssertEqual(loaded.fontSize, 24)
+        XCTAssertNil(loaded.appearance)
+    }
+
     func testClampsOutOfRangeValues() {
         var settings = ReaderSettings()
         settings.fontSize = 500

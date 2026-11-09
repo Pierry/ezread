@@ -13,6 +13,9 @@ final class WindowController: NSWindowController, NSWindowDelegate, NSMenuItemVa
     private let reader: ReaderView
     private let source = SourceEditor()
 
+    private let editButton = NSButton()
+    private let saveButton = NSButton()
+
     private var session: DocumentSession?
     private var isShowingSource = false
     private var renderedText: String?
@@ -24,6 +27,7 @@ final class WindowController: NSWindowController, NSWindowDelegate, NSMenuItemVa
 
     init(root: URL) {
         self.root = root
+        SettingsStore.applyAppearance()
         self.reader = ReaderView(root: root)
 
         let window = NSWindow(
@@ -61,6 +65,7 @@ final class WindowController: NSWindowController, NSWindowDelegate, NSMenuItemVa
         split.setHoldingPriority(.defaultHigh, forSubviewAt: 0)
         sidebar.isHidden = true
         addSidebarButton(to: window)
+        addEditButtons(to: window)
 
         for view in [reader, source] as [NSView] {
             view.frame = content.bounds
@@ -68,15 +73,25 @@ final class WindowController: NSWindowController, NSWindowDelegate, NSMenuItemVa
             content.addSubview(view)
         }
         source.isHidden = true
+
+        let bounds = window.contentView!.bounds
+        let dragStrip = TitlebarDragView(frame: NSRect(
+            x: 0,
+            y: bounds.height - TitlebarDragView.height,
+            width: bounds.width,
+            height: TitlebarDragView.height
+        ))
+        dragStrip.autoresizingMask = [.width, .minYMargin]
+        window.contentView!.addSubview(dragStrip)
     }
 
     /// Sits beside the window buttons, so it stays visible when collapsed.
     private func addSidebarButton(to window: NSWindow) {
-        let image = NSImage(systemSymbolName: "sidebar.left", accessibilityDescription: "Mostrar ou ocultar menu lateral")!
+        let image = NSImage(systemSymbolName: "sidebar.left", accessibilityDescription: "Show or hide sidebar")!
         let button = NSButton(image: image, target: self, action: #selector(toggleSidebar(_:)))
         button.isBordered = false
         button.contentTintColor = Theme.text
-        button.toolTip = "Mostrar ou ocultar menu lateral (Cmd+\\)"
+        button.toolTip = "Show or hide sidebar (Cmd+\\)"
         button.frame = NSRect(x: 8, y: 2, width: 28, height: 24)
 
         let holder = NSView(frame: NSRect(x: 0, y: 0, width: 44, height: 28))
@@ -88,13 +103,51 @@ final class WindowController: NSWindowController, NSWindowDelegate, NSMenuItemVa
         window.addTitlebarAccessoryViewController(accessory)
     }
 
+    private func addEditButtons(to window: NSWindow) {
+        saveButton.image = NSImage(systemSymbolName: "square.and.arrow.down", accessibilityDescription: "Save")
+        saveButton.toolTip = "Save (Cmd+S)"
+        saveButton.target = self
+        saveButton.action = #selector(saveDocument(_:))
+        saveButton.frame = NSRect(x: 4, y: 2, width: 28, height: 24)
+
+        editButton.target = self
+        editButton.action = #selector(toggleSource(_:))
+        editButton.frame = NSRect(x: 40, y: 2, width: 28, height: 24)
+
+        let holder = NSView(frame: NSRect(x: 0, y: 0, width: 80, height: 28))
+        for button in [saveButton, editButton] {
+            button.isBordered = false
+            button.contentTintColor = Theme.text
+            holder.addSubview(button)
+        }
+
+        let accessory = NSTitlebarAccessoryViewController()
+        accessory.view = holder
+        accessory.layoutAttribute = .trailing
+        window.addTitlebarAccessoryViewController(accessory)
+        refreshEditControls()
+    }
+
+    private func refreshEditControls() {
+        let isDirty = session?.isDirty ?? false
+        window?.isDocumentEdited = isDirty
+        saveButton.isHidden = !isDirty
+        editButton.isEnabled = session != nil
+        let label = isShowingSource ? "Read" : "Edit"
+        editButton.image = NSImage(
+            systemSymbolName: isShowingSource ? "book" : "pencil",
+            accessibilityDescription: label
+        )
+        editButton.toolTip = "\(label) (Cmd+E)"
+    }
+
     private func connectCallbacks() {
         tree.onSelect = { [weak self] path in self?.open(relativePath: path, fragment: nil) }
         reader.onInternalLink = { [weak self] path, fragment in self?.open(relativePath: path, fragment: fragment) }
         source.onChange = { [weak self] in
             guard let self, let session = self.session else { return }
             session.text = self.source.string
-            self.window?.isDocumentEdited = session.isDirty
+            self.refreshEditControls()
         }
     }
 
@@ -107,7 +160,7 @@ final class WindowController: NSWindowController, NSWindowDelegate, NSMenuItemVa
         if let file = target.initialFile {
             open(file: file, fragment: nil)
         } else if session == nil {
-            reader.show(html: "<p class=\"empty\">Escolha um arquivo na lista.</p>", highlight: false)
+            reader.show(html: "<p class=\"empty\">Choose a file from the list.</p>", highlight: false)
         }
         refreshTree(showSidebarIfUseful: !target.wasFile, forceSidebar: target.initialFile == nil)
     }
@@ -134,14 +187,13 @@ final class WindowController: NSWindowController, NSWindowDelegate, NSMenuItemVa
         do {
             try next.load()
         } catch {
-            showError("Não consegui ler este arquivo como UTF-8.", file.path)
+            showError("Could not read this file as UTF-8.", file.path)
             tree.select(relativePath: currentRelativePath)
             return
         }
 
         session = next
         renderedText = nil
-        window?.isDocumentEdited = false
         window?.title = file.lastPathComponent
         window?.representedURL = file
         showReaderPane()
@@ -193,6 +245,7 @@ final class WindowController: NSWindowController, NSWindowDelegate, NSMenuItemVa
         source.isHidden = true
         reader.isHidden = false
         window?.makeFirstResponder(reader.web)
+        refreshEditControls()
     }
 
     private func showSourcePane() {
@@ -200,6 +253,7 @@ final class WindowController: NSWindowController, NSWindowDelegate, NSMenuItemVa
         reader.isHidden = true
         source.isHidden = false
         window?.makeFirstResponder(source.editorView)
+        refreshEditControls()
     }
 
     @objc func toggleSource(_ sender: Any?) {
@@ -255,21 +309,21 @@ final class WindowController: NSWindowController, NSWindowDelegate, NSMenuItemVa
         do {
             switch try session.save() {
             case .saved:
-                window?.isDocumentEdited = false
+                refreshEditControls()
                 return true
             case .conflict:
                 let alert = NSAlert()
-                alert.messageText = "Este arquivo mudou no disco."
-                alert.informativeText = "Salvar agora substitui a versão que está no disco."
-                alert.addButton(withTitle: "Sobrescrever")
-                alert.addButton(withTitle: "Cancelar")
+                alert.messageText = "This file changed on disk."
+                alert.informativeText = "Saving now replaces the version on disk."
+                alert.addButton(withTitle: "Overwrite")
+                alert.addButton(withTitle: "Cancel")
                 guard alert.runModal() == .alertFirstButtonReturn else { return false }
                 _ = try session.save(force: true)
-                window?.isDocumentEdited = false
+                refreshEditControls()
                 return true
             }
         } catch {
-            showError("Não consegui salvar.", error.localizedDescription)
+            showError("Could not save.", error.localizedDescription)
             return false
         }
     }
@@ -280,10 +334,10 @@ final class WindowController: NSWindowController, NSWindowDelegate, NSMenuItemVa
         guard session.isDirty else { return true }
 
         let alert = NSAlert()
-        alert.messageText = "Salvar as alterações em \(session.url.lastPathComponent)?"
-        alert.addButton(withTitle: "Salvar")
-        alert.addButton(withTitle: "Descartar")
-        alert.addButton(withTitle: "Cancelar")
+        alert.messageText = "Save changes to \(session.url.lastPathComponent)?"
+        alert.addButton(withTitle: "Save")
+        alert.addButton(withTitle: "Discard")
+        alert.addButton(withTitle: "Cancel")
         switch alert.runModal() {
         case .alertFirstButtonReturn: return saveCurrent()
         case .alertSecondButtonReturn: return true

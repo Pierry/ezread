@@ -4,6 +4,7 @@ import ZreadCore
 /// Reader typography controls, shown inside the sidebar.
 final class SettingsPanel: NSView {
     private let stack = NSStackView()
+    private let theme = NSPopUpButton()
     private let fontStyle = NSPopUpButton()
     private let fontSize = NSSlider()
     private let fontSizeValue = SettingsPanel.valueLabel()
@@ -28,7 +29,11 @@ final class SettingsPanel: NSView {
             stack.trailingAnchor.constraint(equalTo: trailingAnchor),
         ])
 
-        fontStyle.addItems(withTitles: ["Serifada", "Monoespaçada"])
+        theme.addItems(withTitles: ["System", "Light", "Dark"])
+        theme.target = self
+        theme.action = #selector(controlChanged)
+
+        fontStyle.addItems(withTitles: ["Serif", "Monospaced"])
         fontStyle.target = self
         fontStyle.action = #selector(controlChanged)
 
@@ -38,20 +43,23 @@ final class SettingsPanel: NSView {
 
         color.target = self
         color.action = #selector(controlChanged)
-        let useDefaultColor = NSButton(title: "Padrão", target: self, action: #selector(resetColor))
+        let useDefaultColor = NSButton(title: "Default", target: self, action: #selector(resetColor))
         useDefaultColor.controlSize = .small
         let colorRow = NSStackView(views: [color, useDefaultColor])
         colorRow.spacing = 10
 
-        let reset = NSButton(title: "Restaurar padrões", target: self, action: #selector(resetAll))
+        let reset = NSButton(title: "Restore Defaults", target: self, action: #selector(resetAll))
         reset.controlSize = .small
 
-        addHeader("Fonte", nil)
+        addHeader("Theme", nil)
+        stack.addArrangedSubview(theme)
+        stack.setCustomSpacing(16, after: theme)
+        addHeader("Font", nil)
         stack.addArrangedSubview(fontStyle)
-        addSlider("Tamanho", fontSizeValue, fontSize)
-        addSlider("Espaço entre letras", letterSpacingValue, letterSpacing)
-        addSlider("Altura da linha", lineHeightValue, lineHeight)
-        addHeader("Cor primária", nil)
+        addSlider("Size", fontSizeValue, fontSize)
+        addSlider("Letter spacing", letterSpacingValue, letterSpacing)
+        addSlider("Line height", lineHeightValue, lineHeight)
+        addHeader("Primary color", nil)
         stack.addArrangedSubview(colorRow)
         stack.setCustomSpacing(20, after: colorRow)
         stack.addArrangedSubview(reset)
@@ -113,6 +121,7 @@ final class SettingsPanel: NSView {
 
     @objc private func refresh() {
         let settings = SettingsStore.current
+        theme.selectItem(at: settings.appearance == nil ? 0 : (settings.appearance == .light ? 1 : 2))
         fontStyle.selectItem(at: settings.fontStyle == .medium ? 0 : 1)
         fontSize.doubleValue = settings.fontSize
         fontSizeValue.stringValue = String(format: "%.0f px", settings.fontSize)
@@ -125,6 +134,7 @@ final class SettingsPanel: NSView {
 
     @objc private func controlChanged(_ sender: Any?) {
         var settings = SettingsStore.current
+        settings.appearance = [nil, .light, .dark][theme.indexOfSelectedItem]
         settings.fontStyle = fontStyle.indexOfSelectedItem == 0 ? .medium : .monospaced
         settings.fontSize = fontSize.doubleValue.rounded()
         settings.letterSpacing = (letterSpacing.doubleValue * 1000).rounded() / 1000

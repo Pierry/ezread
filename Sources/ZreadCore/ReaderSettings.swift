@@ -6,12 +6,19 @@ public struct ReaderSettings: Codable, Equatable {
         case monospaced
     }
 
+    public enum Appearance: String, Codable {
+        case light
+        case dark
+    }
+
     public static let fontSizeRange = 14.0...32.0
     public static let letterSpacingRange = -0.05...0.15
     public static let lineHeightRange = 1.1...2.4
 
     private static let defaultsKey = "readerSettings"
 
+    /// nil follows the macOS appearance.
+    public var appearance: Appearance?
     public var fontSize: Double = 20
     public var fontStyle: FontStyle = .medium
     /// `#RRGGBB`, or nil to use the theme's text color.

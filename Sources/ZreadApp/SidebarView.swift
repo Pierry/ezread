@@ -17,15 +17,15 @@ final class SidebarView: NSView {
         addSubview(tree)
         addSubview(settings)
 
-        gear.image = NSImage(systemSymbolName: "gearshape", accessibilityDescription: "Ajustes")
-        gear.title = "Ajustes"
+        gear.image = NSImage(systemSymbolName: "gearshape", accessibilityDescription: "Settings")
+        gear.title = "Settings"
         gear.imagePosition = .imageLeading
         gear.isBordered = false
         gear.font = NSFont(name: "Helvetica Neue", size: 13)
         gear.contentTintColor = Theme.text
         gear.target = self
         gear.action = #selector(toggleSettings)
-        gear.toolTip = "Ajustes de leitura (Cmd+,)"
+        gear.toolTip = "Reading settings (Cmd+,)"
         addSubview(gear)
     }
 
@@ -57,7 +57,7 @@ final class SidebarView: NSView {
     private func setSettings(visible: Bool) {
         settings.isHidden = !visible
         tree.isHidden = visible
-        gear.title = visible ? "Arquivos" : "Ajustes"
+        gear.title = visible ? "Files" : "Settings"
         gear.image = NSImage(
             systemSymbolName: visible ? "folder" : "gearshape",
             accessibilityDescription: gear.title

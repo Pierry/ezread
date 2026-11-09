@@ -1,10 +1,10 @@
 <!doctype html>
-<html lang="pt-BR">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>zread</title>
-<meta name="description" content="Leitor de Markdown para macOS. Rode zread . em um repositório e leia os docs como artigos.">
+<meta name="description" content="A Markdown reader for macOS. Run zread . in a repository and read the docs as articles.">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -127,59 +127,59 @@ footer { padding: 40px 0 64px; color: var(--muted); font-size: 16px; }
       <svg width="38" height="38" viewBox="0 0 64 64" aria-hidden="true"><rect class="mark-tile" x="2" y="2" width="60" height="60" rx="17"/><path class="mark-z" d="M21 21H43L21 43H43"/></svg>
       zread
     </a>
-    <a href="https://github.com/Pierry/zread">Código no GitHub</a>
+    <a href="https://github.com/Pierry/zread">Code on GitHub</a>
   </header>
 
   <main>
     <div class="hero">
-      <h1>Leia os docs do seu repo como artigos.</h1>
-      <p class="lead">O zread é um app para Mac que abre direto no texto renderizado. Rode <code>zread .</code> em qualquer pasta e navegue pelo Markdown dela. Editar fica a um atalho de distância, sem atrapalhar a leitura.</p>
+      <h1>Read your repo's docs like articles.</h1>
+      <p class="lead">zread is a Mac app that opens straight into rendered text. Run <code>zread .</code> in any folder and browse its Markdown. Editing is one shortcut away and stays out of your reading.</p>
       <div class="command">
         <code id="install">brew install pierry/zread/zread</code>
-        <button type="button" id="copy">Copiar</button>
+        <button type="button" id="copy">Copy</button>
       </div>
     </div>
 
     <section aria-labelledby="shots-title">
       <div class="shots-head">
-        <h2 id="shots-title">Feito só para ler.</h2>
-        <div class="choices" role="group" aria-label="Tema da captura">
-          <button type="button" id="show-light" aria-pressed="true">Claro</button>
-          <button type="button" id="show-dark" aria-pressed="false">Escuro</button>
+        <h2 id="shots-title">Made only for reading.</h2>
+        <div class="choices" role="group" aria-label="Screenshot theme">
+          <button type="button" id="show-light" aria-pressed="true">Light</button>
+          <button type="button" id="show-dark" aria-pressed="false">Dark</button>
         </div>
       </div>
-      <img class="window" id="shot-light" src="assets/claro.png" width="2080" height="1600" alt="Janela do zread em tema claro, com a lista de arquivos à esquerda e um documento em coluna central.">
-      <img class="window" id="shot-dark" src="assets/escuro.png" width="2080" height="1600" alt="Janela do zread em tema escuro, com a lista de arquivos à esquerda e um documento em coluna central." hidden>
+      <img class="window" id="shot-light" src="assets/light.png" width="2080" height="1600" alt="zread window in the light theme, with the file list on the left and a document in a central column.">
+      <img class="window" id="shot-dark" src="assets/dark.png" width="2080" height="1600" alt="zread window in the dark theme, with the file list on the left and a document in a central column." hidden>
     </section>
 
     <section aria-labelledby="demo-title">
-      <div class="demo-head"><h2 id="demo-title">Ajuste até ficar do seu jeito.</h2></div>
+      <div class="demo-head"><h2 id="demo-title">Set the page the way you read.</h2></div>
       <div class="demo">
         <form class="controls" id="controls">
           <fieldset>
-            <legend>Fonte</legend>
+            <legend>Font</legend>
             <div class="choices">
-              <button type="button" id="font-serif" aria-pressed="true">Serifada</button>
-              <button type="button" id="font-mono" aria-pressed="false">Monoespaçada</button>
+              <button type="button" id="font-serif" aria-pressed="true">Serif</button>
+              <button type="button" id="font-mono" aria-pressed="false">Monospaced</button>
             </div>
           </fieldset>
-          <label class="control"><span>Tamanho <output id="size-out">20 px</output></span><input id="size" type="range" min="14" max="32" step="1" value="20"></label>
-          <label class="control"><span>Espaço entre letras <output id="tracking-out">-0.003 em</output></span><input id="tracking" type="range" min="-0.05" max="0.15" step="0.001" value="-0.003"></label>
-          <label class="control"><span>Altura da linha <output id="line-out">1.60</output></span><input id="line" type="range" min="1.1" max="2.4" step="0.01" value="1.6"></label>
+          <label class="control"><span>Size <output id="size-out">20 px</output></span><input id="size" type="range" min="14" max="32" step="1" value="20"></label>
+          <label class="control"><span>Letter spacing <output id="tracking-out">-0.003 em</output></span><input id="tracking" type="range" min="-0.05" max="0.15" step="0.001" value="-0.003"></label>
+          <label class="control"><span>Line height <output id="line-out">1.60</output></span><input id="line" type="range" min="1.1" max="2.4" step="0.01" value="1.6"></label>
           <fieldset>
-            <legend>Cor primária</legend>
+            <legend>Primary color</legend>
             <div class="swatches" id="swatches">
-              <button type="button" class="swatch" data-color="" style="background:var(--ink)" aria-label="Padrão" aria-pressed="true"></button>
-              <button type="button" class="swatch" data-color="#2f6fd0" style="background:#2f6fd0" aria-label="Azul" aria-pressed="false"></button>
-              <button type="button" class="swatch" data-color="#2e7a8a" style="background:#2e7a8a" aria-label="Petróleo" aria-pressed="false"></button>
-              <button type="button" class="swatch" data-color="#8a5bc0" style="background:#8a5bc0" aria-label="Violeta" aria-pressed="false"></button>
+              <button type="button" class="swatch" data-color="" style="background:var(--ink)" aria-label="Default" aria-pressed="true"></button>
+              <button type="button" class="swatch" data-color="#2f6fd0" style="background:#2f6fd0" aria-label="Blue" aria-pressed="false"></button>
+              <button type="button" class="swatch" data-color="#2e7a8a" style="background:#2e7a8a" aria-label="Teal" aria-pressed="false"></button>
+              <button type="button" class="swatch" data-color="#8a5bc0" style="background:#8a5bc0" aria-label="Violet" aria-pressed="false"></button>
             </div>
           </fieldset>
         </form>
         <article class="article" id="article">
-          <h3>Como o deploy funciona</h3>
-          <p>Cada merge na main gera uma imagem nova. O serviço só troca de versão depois que a verificação de saúde passa em todas as réplicas.</p>
-          <blockquote>Se a verificação falhar, a versão anterior continua no ar.</blockquote>
+          <h3>How deploys work</h3>
+          <p>Every merge to main builds a new image. The service switches versions only after the health check passes on every replica.</p>
+          <blockquote>If the check fails, the previous version stays live.</blockquote>
           <pre><code>make deploy ENV=staging</code></pre>
         </article>
       </div>
@@ -187,32 +187,32 @@ footer { padding: 40px 0 64px; color: var(--muted); font-size: 16px; }
 
     <section class="details">
       <div>
-        <h2>Instale em dois comandos.</h2>
+        <h2>Install in two commands.</h2>
         <ol>
-          <li><code>brew install pierry/zread/zread</code> compila o app na sua máquina. Precisa de macOS 14 ou superior e do Xcode.</li>
-          <li><code>zread .</code> abre a pasta atual. Para um arquivo, use <code>zread docs/design.md</code>.</li>
+          <li><code>brew install pierry/zread/zread</code> builds the app on your Mac. Needs macOS 14 or later and Xcode.</li>
+          <li><code>zread .</code> opens the current folder. For one file, use <code>zread docs/design.md</code>.</li>
         </ol>
-        <p class="note">O zread ainda não é notarizado pela Apple. Compilar localmente evita o aviso do macOS. Um <code>.app</code> baixado pronto é bloqueado até você rodar <code>xattr -dr com.apple.quarantine zread.app</code>, e isso só vale para origem em que você confia.</p>
+        <p class="note">zread is not notarized by Apple yet. Building locally avoids the macOS warning. A downloaded <code>.app</code> stays blocked until you run <code>xattr -dr com.apple.quarantine zread.app</code>, so do that only for a source you trust.</p>
       </div>
       <div>
-        <h2>Atalhos.</h2>
+        <h2>Shortcuts.</h2>
         <table>
-          <tr><td><kbd>Cmd E</kbd></td><td>Alterna entre leitura e texto cru</td></tr>
-          <tr><td><kbd>Cmd S</kbd></td><td>Salva o arquivo</td></tr>
-          <tr><td><kbd>Cmd \</kbd></td><td>Mostra ou oculta o menu lateral</td></tr>
-          <tr><td><kbd>Cmd ,</kbd></td><td>Abre os ajustes de leitura</td></tr>
-          <tr><td><kbd>Cmd O</kbd></td><td>Abre outra pasta ou arquivo</td></tr>
+          <tr><td><kbd>Cmd E</kbd></td><td>Switch between reading and raw text</td></tr>
+          <tr><td><kbd>Cmd S</kbd></td><td>Save the file</td></tr>
+          <tr><td><kbd>Cmd \</kbd></td><td>Show or hide the sidebar</td></tr>
+          <tr><td><kbd>Cmd ,</kbd></td><td>Open reading settings</td></tr>
+          <tr><td><kbd>Cmd O</kbd></td><td>Open another folder or file</td></tr>
         </table>
       </div>
     </section>
 
     <section aria-labelledby="safe-title">
-      <h2 id="safe-title">Seguro para repo alheio.</h2>
-      <p class="note">O zread não executa nada que venha do Markdown. HTML cru é descartado, imagens remotas não carregam e o app só lê imagens de dentro da pasta aberta. O custo aparece em alguns READMEs: badges remotos somem.</p>
+      <h2 id="safe-title">Safe for someone else's repo.</h2>
+      <p class="note">zread runs nothing that comes from Markdown. Raw HTML is dropped, remote images do not load, and the app reads images only from inside the open folder. Some READMEs pay for this: remote badges disappear.</p>
     </section>
   </main>
 
-  <footer>Código aberto sob licença MIT. <a href="https://github.com/Pierry/zread">Veja o código e abra issues no GitHub</a>.</footer>
+  <footer>Open source under the MIT license. <a href="https://github.com/Pierry/zread">Read the code and open issues on GitHub</a>.</footer>
 </div>
 
 <script>
@@ -223,9 +223,9 @@ footer { padding: 40px 0 64px; color: var(--muted); font-size: 16px; }
   byId("copy").addEventListener("click", async (event) => {
     try {
       await navigator.clipboard.writeText(byId("install").textContent);
-      event.currentTarget.textContent = "Copiado";
+      event.currentTarget.textContent = "Copied";
     } catch {
-      event.currentTarget.textContent = "Selecione e copie";
+      event.currentTarget.textContent = "Select and copy";
     }
   });
 
