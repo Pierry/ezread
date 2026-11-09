@@ -1,5 +1,6 @@
 import AppKit
 import WebKit
+import ZreadCore
 
 private final class ScrollRelay: NSObject, WKScriptMessageHandler {
     var onLine: ((Int) -> Void)?
@@ -68,6 +69,28 @@ final class ReaderView: NSView {
             self?.web.alphaValue = 1
             completion?()
         }
+    }
+
+    func showAttentionLoading() {
+        run("zread.showAttentionLoading(); true")
+    }
+
+    func showAttention(_ brief: AttentionBrief) {
+        guard let data = try? JSONEncoder().encode(brief) else { return }
+        run("zread.showAttention(\(String(decoding: data, as: UTF8.self))); true")
+    }
+
+    func showAttentionError(_ message: String) {
+        guard let argument = Self.jsonString(message) else { return }
+        run("zread.showAttentionError(\(argument)); true")
+    }
+
+    func clearAttention() {
+        run("zread.clearAttention(); true")
+    }
+
+    func scrollToTop() {
+        run("zread.scrollToTop(); true")
     }
 
     func topVisibleLine(_ completion: @escaping (Int) -> Void) {

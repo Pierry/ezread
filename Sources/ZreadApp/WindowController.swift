@@ -16,6 +16,11 @@ final class WindowController: NSWindowController, NSWindowDelegate, NSMenuItemVa
 
     private let editButton = NSButton()
     private let saveButton = NSButton()
+    private let attentionButton = NSButton()
+
+    private let claude = ClaudeBridge()
+    private var askedText: String?
+    private var briefIsReady = false
 
     private var session: DocumentSession?
     private var isShowingSource = false
@@ -118,10 +123,16 @@ final class WindowController: NSWindowController, NSWindowDelegate, NSMenuItemVa
 
         editButton.target = self
         editButton.action = #selector(toggleSource(_:))
-        editButton.frame = NSRect(x: 70, y: 3, width: 60, height: 22)
+        editButton.frame = NSRect(x: 186, y: 3, width: 60, height: 22)
 
-        let holder = NSView(frame: NSRect(x: 0, y: 0, width: 142, height: 28))
-        for button in [saveButton, editButton] {
+        attentionButton.title = "What matters?"
+        attentionButton.toolTip = "What do I really need to read?"
+        attentionButton.target = self
+        attentionButton.action = #selector(askWhatMatters(_:))
+        attentionButton.frame = NSRect(x: 70, y: 3, width: 110, height: 22)
+
+        let holder = NSView(frame: NSRect(x: 0, y: 0, width: 258, height: 28))
+        for button in [saveButton, attentionButton, editButton] {
             button.bezelStyle = .rounded
             button.controlSize = .small
             holder.addSubview(button)
@@ -139,6 +150,7 @@ final class WindowController: NSWindowController, NSWindowDelegate, NSMenuItemVa
         window?.isDocumentEdited = isDirty
         saveButton.isHidden = !isDirty
         editButton.isEnabled = session != nil
+        attentionButton.isEnabled = session != nil && !isShowingSource && !claude.isRunning
         editButton.title = isShowingSource ? "Read" : "Edit"
         editButton.toolTip = "\(editButton.title) (Cmd+E)"
     }
@@ -250,6 +262,7 @@ final class WindowController: NSWindowController, NSWindowDelegate, NSMenuItemVa
 
     private func render(completion: (() -> Void)? = nil) {
         guard let session else { return }
+        discardBriefIfStale()
         let directory = (currentRelativePath.map { ($0 as NSString).deletingLastPathComponent }) ?? ""
         let rendered = MarkdownRenderer.render(markdown: session.text, documentDirectory: directory)
         let highlight = rendered.hasCode && session.text.utf8.count <= Self.highlightLimit
@@ -276,6 +289,42 @@ final class WindowController: NSWindowController, NSWindowDelegate, NSMenuItemVa
                 }
             }
         }
+    }
+
+    // MARK: What matters
+
+    @objc func askWhatMatters(_ sender: Any?) {
+        guard let session, !isShowingSource, !claude.isRunning else { return }
+        if briefIsReady, askedText == session.text {
+            reader.scrollToTop()
+            return
+        }
+
+        askedText = session.text
+        briefIsReady = false
+        reader.showAttentionLoading()
+        claude.ask(document: session.text) { [weak self] result in
+            guard let self else { return }
+            switch result {
+            case .success(let brief):
+                self.briefIsReady = true
+                self.reader.showAttention(brief)
+            case .failure(let failure):
+                self.reader.showAttentionError(failure.message)
+            }
+            self.refreshEditControls()
+        }
+        refreshEditControls()
+    }
+
+    /// An answer about other text would mislead, so it leaves with that text.
+    private func discardBriefIfStale() {
+        guard let askedText, askedText != session?.text else { return }
+        claude.cancel()
+        self.askedText = nil
+        briefIsReady = false
+        reader.clearAttention()
+        refreshEditControls()
     }
 
     // MARK: Modes
@@ -406,6 +455,7 @@ final class WindowController: NSWindowController, NSWindowDelegate, NSMenuItemVa
     }
 
     func windowWillClose(_ notification: Notification) {
+        claude.cancel()
         persistState()
         onClose?()
     }
