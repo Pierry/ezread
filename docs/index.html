@@ -220,6 +220,10 @@ footer { padding: 40px 0 64px; color: var(--muted); font-size: 16px; }
           <li><code>zread .</code> opens the current folder. For one file, use <code>zread docs/design.md</code>.</li>
         </ol>
         <p class="note">zread is not notarized by Apple yet. Building locally avoids the macOS warning. A downloaded <code>.app</code> stays blocked until you run <code>xattr -dr com.apple.quarantine zread.app</code>, so do that only for a source you trust.</p>
+        <h2>Update by hand.</h2>
+        <p><code>brew update &amp;&amp; brew upgrade pierry/zread/zread</code></p>
+        <p><strong>This command is the only way to get a new version.</strong> zread runs entirely offline: it never connects to the internet, so it can't check for updates or tell you that one exists.</p>
+        <p class="note">The one exception is the What matters? button. Only when you click it, zread runs your own Claude Code, which sends the open document to Anthropic under your account.</p>
       </div>
       <div>
         <h2>Shortcuts.</h2>

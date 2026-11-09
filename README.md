@@ -55,6 +55,21 @@ That's it. You need macOS 14 or later and Xcode, because Homebrew builds the app
 on your Mac. zread isn't notarized by Apple yet, and building it locally means
 macOS opens it without a warning.
 
+## Update
+
+```sh
+brew update && brew upgrade pierry/zread/zread
+```
+
+**This command is the only way to get a new version.** zread runs entirely
+offline: it never connects to the internet, so it can't check for updates or
+tell you that one exists. Run the command whenever you want the latest release,
+then reopen the app.
+
+The one exception is the What matters? button. Only when you click it, zread
+runs your own Claude Code, which sends the open document to Anthropic under your
+account. Without Claude Code, everything else works the same.
+
 ## Use it
 
 ```sh
