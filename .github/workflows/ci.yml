@@ -1,0 +1,26 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: macos-15
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Tests and coverage
+        run: scripts/coverage.sh 90
+      - name: Build the app bundle
+        run: scripts/bundle.sh
+      - name: Check the bundle
+        run: |
+          test -x build/zread.app/Contents/MacOS/ZreadApp
+          test -x build/zread.app/Contents/MacOS/zread
+          test -f build/zread.app/Contents/Resources/web/reader.js
+          codesign --verify --deep build/zread.app

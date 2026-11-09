@@ -115,7 +115,61 @@ window.zread = (() => {
     scrollTimer = setTimeout(() => window.webkit.messageHandlers.zreadScroll.postMessage(topLine()), 300);
   });
 
+  const ATTENTION_TITLE = "What needs your attention";
+
+  // Model output is only ever set as text, never parsed as HTML.
+  function element(tag, text) {
+    const node = document.createElement(tag);
+    if (text !== undefined) node.textContent = text;
+    return node;
+  }
+
+  function fillAttention(...children) {
+    const panel = document.getElementById("attention");
+    panel.replaceChildren(element("h2", ATTENTION_TITLE), ...children);
+    panel.hidden = false;
+    window.scrollTo(0, 0);
+  }
+
+  function attentionList(title, items) {
+    if (!items.length) return [];
+    const list = element("ul");
+    items.forEach((item) => list.appendChild(element("li", item)));
+    return [element("h3", title), list];
+  }
+
   return {
+    showAttentionLoading() {
+      const status = element("div");
+      status.className = "status";
+      const spinner = element("div");
+      spinner.className = "spinner";
+      status.append(spinner, element("span", "Claude is reading the document…"));
+      fillAttention(status);
+    },
+
+    showAttention(brief) {
+      fillAttention(
+        element("p", brief.summary),
+        ...attentionList("Don't miss", brief.attention),
+        ...attentionList("Decisions to make", brief.decisions),
+      );
+    },
+
+    showAttentionError(message) {
+      fillAttention(element("p", message));
+    },
+
+    clearAttention() {
+      const panel = document.getElementById("attention");
+      panel.hidden = true;
+      panel.replaceChildren();
+    },
+
+    scrollToTop() {
+      window.scrollTo(0, 0);
+    },
+
     applySettings(settings) {
       const root = document.documentElement;
       root.style.setProperty("--reader-font-size", `${settings.fontSize}px`);

@@ -1,0 +1,29 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: macos-15
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Tag matches the app version
+        run: |
+          version=$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' Resources/Info.plist)
+          test "v$version" = "$GITHUB_REF_NAME"
+      - name: Tests and coverage
+        run: scripts/coverage.sh 90
+      - name: Build the app bundle
+        run: scripts/bundle.sh
+      - name: Publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          ditto -c -k --keepParent build/zread.app "zread-$GITHUB_REF_NAME-macos.zip"
+          gh release create "$GITHUB_REF_NAME" "zread-$GITHUB_REF_NAME-macos.zip" --generate-notes --verify-tag
