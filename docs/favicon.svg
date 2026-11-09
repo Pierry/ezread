@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <title>zread</title>
+  <rect x="2" y="2" width="60" height="60" rx="17" fill="#dae6f5" stroke="#18191b" stroke-width="3.5" />
+  <path d="M21 21H43L21 43H43" fill="none" stroke="#18191b" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" />
+</svg>

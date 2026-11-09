@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>zread</title>
+<meta name="description" content="Leitor de Markdown para macOS. Rode zread . em um repositório e leia os docs como artigos.">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,600&family=JetBrains+Mono:wght@400;500&family=Newsreader:opsz,wght@6..72,400;6..72,500&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,700;1,8..60,400&display=swap">
+<style>
+:root {
+  color-scheme: light dark;
+  --surface: #f3f3f1;
+  --card: #ffffff;
+  --ink: #18191b;
+  --muted: #55585e;
+  --dot: #d2d3d6;
+  --blue-soft: #dae6f5;
+  --link: #2459a8;
+  --accent: #3b7dd8;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --surface: #18191b;
+    --card: #1e1f22;
+    --ink: #e6e7ea;
+    --muted: #b3b6bc;
+    --dot: #303236;
+    --blue-soft: #23394f;
+    --link: #9cc3ee;
+    --accent: #6fa8ec;
+  }
+}
+* { box-sizing: border-box; }
+html { background: var(--surface); }
+body {
+  margin: 0;
+  color: var(--ink);
+  font: 400 18px/1.55 "DM Sans", system-ui, sans-serif;
+  background-color: var(--surface);
+  background-image: radial-gradient(var(--dot) 1.2px, transparent 1.2px);
+  background-size: 22px 22px;
+}
+.page { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+a { color: var(--link); text-underline-offset: 3px; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+code, kbd, .command { font-family: "JetBrains Mono", Menlo, monospace; }
+
+.top { display: flex; align-items: center; justify-content: space-between; padding: 28px 0; }
+.brand { display: flex; align-items: center; gap: 12px; font: 500 24px/1 Newsreader, serif; color: var(--ink); text-decoration: none; }
+.brand svg { display: block; }
+.mark-tile { fill: var(--blue-soft); stroke: var(--ink); stroke-width: 3.5; }
+.mark-z { fill: none; stroke: var(--ink); stroke-width: 6; stroke-linecap: round; stroke-linejoin: round; }
+
+.hero { padding: 56px 0 72px; }
+h1, h2 { font-family: Newsreader, serif; font-weight: 400; margin: 0; letter-spacing: -0.02em; }
+h1 { font-size: clamp(3.2rem, 9.4vw, 7.4rem); line-height: 0.98; max-width: 13ch; }
+.lead { font-size: 1.3rem; line-height: 1.45; max-width: 34em; margin: 32px 0 36px; color: var(--muted); }
+h2 { font-size: clamp(2.2rem, 5vw, 3.4rem); line-height: 1.05; max-width: 16ch; }
+
+.command {
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  max-width: 560px; padding: 14px 14px 14px 22px;
+  background: var(--card); border: 2px solid var(--ink); border-radius: 14px;
+  font-size: 17px;
+}
+.command code { overflow-x: auto; white-space: nowrap; }
+button {
+  font: 600 15px/1 "DM Sans", sans-serif; color: var(--ink); cursor: pointer;
+  padding: 10px 14px; background: var(--blue-soft); border: 2px solid var(--ink); border-radius: 9px;
+}
+button[aria-pressed="false"] { background: transparent; }
+
+section { padding: 72px 0; }
+.shots-head, .demo-head { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 20px; margin-bottom: 28px; }
+.choices { display: flex; gap: 8px; }
+.window { display: block; width: 100%; height: auto; border: 2px solid var(--ink); border-radius: 18px; background: var(--card); }
+[hidden] { display: none !important; }
+
+.demo { display: grid; grid-template-columns: 300px minmax(0, 1fr); background: var(--card); border: 2px solid var(--ink); border-radius: 18px; overflow: hidden; }
+.controls { padding: 28px; background: var(--blue-soft); border-right: 2px solid var(--ink); }
+.control { display: block; margin-bottom: 22px; font-weight: 600; font-size: 15px; }
+.control > span { display: flex; justify-content: space-between; margin-bottom: 8px; }
+.control output { font-weight: 400; }
+input[type="range"] { width: 100%; margin: 0; accent-color: var(--ink); }
+fieldset { border: 0; margin: 0 0 22px; padding: 0; font-size: 15px; font-weight: 600; }
+legend { padding: 0; margin-bottom: 8px; }
+.swatches { display: flex; gap: 10px; }
+.swatch { width: 34px; height: 34px; padding: 0; border-radius: 50%; }
+.swatch[aria-pressed="true"] { box-shadow: 0 0 0 2px var(--blue-soft), 0 0 0 4px var(--ink); }
+.article { min-width: 0; padding: 48px clamp(24px, 6vw, 72px); --reader-size: 20px; --reader-line: 1.6; --reader-tracking: -0.003em; --reader-primary: var(--ink); --body: "Source Serif 4", Charter, Georgia, serif; --head: "Helvetica Neue", Helvetica, Arial, sans-serif; font-family: var(--body); font-size: var(--reader-size); line-height: var(--reader-line); letter-spacing: var(--reader-tracking); }
+.article.mono { --body: Menlo, monospace; --head: Menlo, monospace; }
+.article h3 { margin: 0 0 0.4em; color: var(--reader-primary); font: 700 1.7em/1.2 var(--head); letter-spacing: calc(var(--reader-tracking) - 0.009em); }
+.article p { margin: 0 0 1.2em; max-width: 34em; }
+.article blockquote { margin: 0 0 1.2em; padding-left: 20px; border-left: 3px solid var(--reader-primary); font-style: italic; }
+.article pre { margin: 0; padding: 16px 18px; overflow-x: auto; border-radius: 6px; background: var(--blue-soft); font: 14px/22px Menlo, monospace; letter-spacing: 0; }
+
+.details { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 64px; }
+.details h2 { margin-bottom: 24px; }
+ol { margin: 0; padding-left: 1.2em; }
+ol li { margin-bottom: 16px; padding-left: 6px; }
+ol code, .note code { font-size: 0.86em; overflow-wrap: anywhere; }
+table { width: 100%; border-collapse: collapse; }
+td { padding: 11px 0; border-bottom: 2px solid var(--dot); vertical-align: top; }
+td:first-child { width: 112px; white-space: nowrap; }
+kbd { font-size: 14px; padding: 3px 8px; background: var(--card); border: 2px solid var(--ink); border-radius: 6px; }
+.note { max-width: 42em; color: var(--muted); }
+footer { padding: 40px 0 64px; color: var(--muted); font-size: 16px; }
+
+@media (max-width: 760px) {
+  body { font-size: 17px; }
+  .hero { padding-top: 24px; }
+  .demo { grid-template-columns: minmax(0, 1fr); }
+  .controls { border-right: 0; border-bottom: 2px solid var(--ink); }
+  .details { grid-template-columns: minmax(0, 1fr); gap: 56px; }
+  section { padding: 48px 0; }
+}
+</style>
+</head>
+<body>
+<div class="page">
+  <header class="top">
+    <a class="brand" href="./">
+      <svg width="38" height="38" viewBox="0 0 64 64" aria-hidden="true"><rect class="mark-tile" x="2" y="2" width="60" height="60" rx="17"/><path class="mark-z" d="M21 21H43L21 43H43"/></svg>
+      zread
+    </a>
+    <a href="https://github.com/Pierry/zread">Código no GitHub</a>
+  </header>
+
+  <main>
+    <div class="hero">
+      <h1>Leia os docs do seu repo como artigos.</h1>
+      <p class="lead">O zread é um app para Mac que abre direto no texto renderizado. Rode <code>zread .</code> em qualquer pasta e navegue pelo Markdown dela. Editar fica a um atalho de distância, sem atrapalhar a leitura.</p>
+      <div class="command">
+        <code id="install">brew install pierry/zread/zread</code>
+        <button type="button" id="copy">Copiar</button>
+      </div>
+    </div>
+
+    <section aria-labelledby="shots-title">
+      <div class="shots-head">
+        <h2 id="shots-title">Feito só para ler.</h2>
+        <div class="choices" role="group" aria-label="Tema da captura">
+          <button type="button" id="show-light" aria-pressed="true">Claro</button>
+          <button type="button" id="show-dark" aria-pressed="false">Escuro</button>
+        </div>
+      </div>
+      <img class="window" id="shot-light" src="assets/claro.png" width="2080" height="1600" alt="Janela do zread em tema claro, com a lista de arquivos à esquerda e um documento em coluna central.">
+      <img class="window" id="shot-dark" src="assets/escuro.png" width="2080" height="1600" alt="Janela do zread em tema escuro, com a lista de arquivos à esquerda e um documento em coluna central." hidden>
+    </section>
+
+    <section aria-labelledby="demo-title">
+      <div class="demo-head"><h2 id="demo-title">Ajuste até ficar do seu jeito.</h2></div>
+      <div class="demo">
+        <form class="controls" id="controls">
+          <fieldset>
+            <legend>Fonte</legend>
+            <div class="choices">
+              <button type="button" id="font-serif" aria-pressed="true">Serifada</button>
+              <button type="button" id="font-mono" aria-pressed="false">Monoespaçada</button>
+            </div>
+          </fieldset>
+          <label class="control"><span>Tamanho <output id="size-out">20 px</output></span><input id="size" type="range" min="14" max="32" step="1" value="20"></label>
+          <label class="control"><span>Espaço entre letras <output id="tracking-out">-0.003 em</output></span><input id="tracking" type="range" min="-0.05" max="0.15" step="0.001" value="-0.003"></label>
+          <label class="control"><span>Altura da linha <output id="line-out">1.60</output></span><input id="line" type="range" min="1.1" max="2.4" step="0.01" value="1.6"></label>
+          <fieldset>
+            <legend>Cor primária</legend>
+            <div class="swatches" id="swatches">
+              <button type="button" class="swatch" data-color="" style="background:var(--ink)" aria-label="Padrão" aria-pressed="true"></button>
+              <button type="button" class="swatch" data-color="#2f6fd0" style="background:#2f6fd0" aria-label="Azul" aria-pressed="false"></button>
+              <button type="button" class="swatch" data-color="#2e7a8a" style="background:#2e7a8a" aria-label="Petróleo" aria-pressed="false"></button>
+              <button type="button" class="swatch" data-color="#8a5bc0" style="background:#8a5bc0" aria-label="Violeta" aria-pressed="false"></button>
+            </div>
+          </fieldset>
+        </form>
+        <article class="article" id="article">
+          <h3>Como o deploy funciona</h3>
+          <p>Cada merge na main gera uma imagem nova. O serviço só troca de versão depois que a verificação de saúde passa em todas as réplicas.</p>
+          <blockquote>Se a verificação falhar, a versão anterior continua no ar.</blockquote>
+          <pre><code>make deploy ENV=staging</code></pre>
+        </article>
+      </div>
+    </section>
+
+    <section class="details">
+      <div>
+        <h2>Instale em dois comandos.</h2>
+        <ol>
+          <li><code>brew install pierry/zread/zread</code> compila o app na sua máquina. Precisa de macOS 14 ou superior e do Xcode.</li>
+          <li><code>zread .</code> abre a pasta atual. Para um arquivo, use <code>zread docs/design.md</code>.</li>
+        </ol>
+        <p class="note">O zread ainda não é notarizado pela Apple. Compilar localmente evita o aviso do macOS. Um <code>.app</code> baixado pronto é bloqueado até você rodar <code>xattr -dr com.apple.quarantine zread.app</code>, e isso só vale para origem em que você confia.</p>
+      </div>
+      <div>
+        <h2>Atalhos.</h2>
+        <table>
+          <tr><td><kbd>Cmd E</kbd></td><td>Alterna entre leitura e texto cru</td></tr>
+          <tr><td><kbd>Cmd S</kbd></td><td>Salva o arquivo</td></tr>
+          <tr><td><kbd>Cmd \</kbd></td><td>Mostra ou oculta o menu lateral</td></tr>
+          <tr><td><kbd>Cmd ,</kbd></td><td>Abre os ajustes de leitura</td></tr>
+          <tr><td><kbd>Cmd O</kbd></td><td>Abre outra pasta ou arquivo</td></tr>
+        </table>
+      </div>
+    </section>
+
+    <section aria-labelledby="safe-title">
+      <h2 id="safe-title">Seguro para repo alheio.</h2>
+      <p class="note">O zread não executa nada que venha do Markdown. HTML cru é descartado, imagens remotas não carregam e o app só lê imagens de dentro da pasta aberta. O custo aparece em alguns READMEs: badges remotos somem.</p>
+    </section>
+  </main>
+
+  <footer>Código aberto sob licença MIT. <a href="https://github.com/Pierry/zread">Veja o código e abra issues no GitHub</a>.</footer>
+</div>
+
+<script>
+(() => {
+  const byId = (id) => document.getElementById(id);
+  const article = byId("article");
+
+  byId("copy").addEventListener("click", async (event) => {
+    try {
+      await navigator.clipboard.writeText(byId("install").textContent);
+      event.currentTarget.textContent = "Copiado";
+    } catch {
+      event.currentTarget.textContent = "Selecione e copie";
+    }
+  });
+
+  function pressGroup(buttons, active) {
+    buttons.forEach((button) => button.setAttribute("aria-pressed", String(button === active)));
+  }
+
+  function showShot(theme) {
+    byId("shot-light").hidden = theme !== "light";
+    byId("shot-dark").hidden = theme !== "dark";
+    pressGroup([byId("show-light"), byId("show-dark")], byId(theme === "light" ? "show-light" : "show-dark"));
+  }
+  byId("show-light").addEventListener("click", () => showShot("light"));
+  byId("show-dark").addEventListener("click", () => showShot("dark"));
+  if (window.matchMedia("(prefers-color-scheme: dark)").matches) showShot("dark");
+
+  const fonts = [byId("font-serif"), byId("font-mono")];
+  fonts.forEach((button) => button.addEventListener("click", () => {
+    pressGroup(fonts, button);
+    article.classList.toggle("mono", button === byId("font-mono"));
+  }));
+
+  const sliders = [
+    ["size", "--reader-size", (v) => `${v}px`, (v) => `${v} px`],
+    ["tracking", "--reader-tracking", (v) => `${v}em`, (v) => `${Number(v).toFixed(3)} em`],
+    ["line", "--reader-line", (v) => v, (v) => Number(v).toFixed(2)],
+  ];
+  sliders.forEach(([id, property, toCss, toLabel]) => {
+    byId(id).addEventListener("input", (event) => {
+      article.style.setProperty(property, toCss(event.target.value));
+      byId(`${id}-out`).textContent = toLabel(event.target.value);
+    });
+  });
+
+  const swatches = [...document.querySelectorAll(".swatch")];
+  swatches.forEach((swatch) => swatch.addEventListener("click", () => {
+    pressGroup(swatches, swatch);
+    if (swatch.dataset.color) article.style.setProperty("--reader-primary", swatch.dataset.color);
+    else article.style.removeProperty("--reader-primary");
+  }));
+})();
+</script>
+</body>
+</html>

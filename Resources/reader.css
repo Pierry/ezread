@@ -1,0 +1,156 @@
+@font-face { font-family: "Source Serif Pro"; src: url("zread://app/vendor/fonts/source-serif-pro-latin-400-normal.woff2") format("woff2"); font-weight: 400; font-style: normal; font-display: block; }
+@font-face { font-family: "Source Serif Pro"; src: url("zread://app/vendor/fonts/source-serif-pro-latin-400-italic.woff2") format("woff2"); font-weight: 400; font-style: italic; font-display: block; }
+@font-face { font-family: "Source Serif Pro"; src: url("zread://app/vendor/fonts/source-serif-pro-latin-700-normal.woff2") format("woff2"); font-weight: 700; font-style: normal; font-display: block; }
+@font-face { font-family: "Source Serif Pro"; src: url("zread://app/vendor/fonts/source-serif-pro-latin-700-italic.woff2") format("woff2"); font-weight: 700; font-style: italic; font-display: block; }
+
+:root {
+  color-scheme: light dark;
+  --background: #F0EEE9;
+  --text: #242424;
+  --muted: #6B6B6B;
+  --rule: rgba(0, 0, 0, 0.12);
+  --code-background: rgba(0, 0, 0, 0.05);
+  --selection: rgba(26, 137, 23, 0.22);
+  --primary: var(--text);
+  --body-font: "Source Serif Pro", Charter, Georgia, serif;
+  --heading-font: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --code-font: Menlo, monospace;
+  --reader-font-size: 20px;
+  --reader-line-height: 1.6;
+  --reader-tracking: -0.003em;
+}
+
+:root[data-font-style="monospaced"] {
+  --body-font: Menlo, monospace;
+  --heading-font: Menlo, monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0A0A0A;
+    --text: #FFFFFF;
+    --muted: #A8A8A8;
+    --rule: rgba(255, 255, 255, 0.18);
+    --code-background: rgba(255, 255, 255, 0.08);
+    --selection: rgba(137, 220, 134, 0.3);
+  }
+}
+
+* { box-sizing: border-box; }
+
+html { background: var(--background); }
+
+body {
+  margin: 0;
+  background: var(--background);
+  color: var(--text);
+  font-family: var(--body-font);
+  font-size: var(--reader-font-size);
+  line-height: var(--reader-line-height);
+  letter-spacing: var(--reader-tracking);
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection { background: var(--selection); }
+
+main {
+  max-width: 728px;
+  margin: 0 auto;
+  padding: 72px 24px 120px;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: var(--primary);
+  font-family: var(--heading-font);
+  font-weight: 700;
+  letter-spacing: calc(var(--reader-tracking) - 0.009em);
+  scroll-margin-top: 56px;
+}
+
+h1 { font-size: 2.1em; line-height: 1.24; margin: 1.15em 0 0.4em; }
+h2 { font-size: 1.2em; line-height: 1.25; margin: 2em 0 0.35em; }
+h3 { font-size: 1em; line-height: 1.3; margin: 1.8em 0 0.2em; }
+h4, h5, h6 { font-size: 0.85em; line-height: 1.4; margin: 1.6em 0 0.2em; }
+main > :first-child { margin-top: 0; }
+
+p { margin: 0 0 1.4em; }
+
+a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: var(--primary);
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+}
+
+strong { font-weight: 700; }
+
+blockquote {
+  margin: 0 0 1.4em;
+  padding-left: 23px;
+  border-left: 3px solid var(--primary);
+  font-style: italic;
+}
+blockquote > :last-child { margin-bottom: 0; }
+
+ul, ol { margin: 0 0 1.4em; padding-left: 1.5em; }
+li { margin-bottom: 0.5em; padding-left: 4px; }
+li > p { margin-bottom: 0.5em; }
+li > ul, li > ol { margin: 0.5em 0 0; }
+li:has(> input[type="checkbox"]) { list-style: none; margin-left: -1.3em; }
+li > input[type="checkbox"] { margin: 0 8px 0 0; accent-color: var(--primary); }
+
+hr {
+  border: 0;
+  height: 32px;
+  margin: 44px 0;
+  text-align: center;
+}
+hr::before {
+  content: "\2022 \2022 \2022";
+  letter-spacing: 16px;
+  font-size: 18px;
+  color: var(--primary);
+}
+
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 12px auto;
+}
+
+code {
+  font-family: var(--code-font);
+  font-size: 0.82em;
+  letter-spacing: 0;
+  background: var(--code-background);
+  padding: 2px 5px;
+  border-radius: 3px;
+}
+
+pre {
+  margin: 0 0 1.4em;
+  padding: 20px;
+  overflow-x: auto;
+  background: var(--code-background);
+  border-radius: 4px;
+  line-height: 22px;
+}
+pre code { font-size: 14px; padding: 0; background: none; border-radius: 0; }
+
+table {
+  display: block;
+  width: max-content;
+  max-width: 100%;
+  overflow-x: auto;
+  border-collapse: collapse;
+  margin: 0 0 1.4em;
+  font-family: var(--body-font);
+  font-size: 0.8em;
+  line-height: 1.5;
+}
+th, td { padding: 8px 14px 8px 0; border-bottom: 1px solid var(--rule); text-align: left; vertical-align: top; }
+th { font-weight: 700; color: var(--primary); }
+
+.empty { color: var(--muted); text-align: center; margin-top: 30vh; }
