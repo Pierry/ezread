@@ -21,7 +21,6 @@ final class ReaderSettingsTests: XCTestCase {
         var settings = ReaderSettings()
         settings.fontSize = 24
         settings.fontStyle = .monospaced
-        settings.primaryColor = "#1A8917"
         settings.letterSpacing = 0.02
         settings.lineHeight = 1.8
         settings.save(to: defaults)
@@ -82,9 +81,7 @@ final class ReaderSettingsTests: XCTestCase {
 
     func testRejectsColorThatIsNotHex() {
         for value in ["red", "#12345", "#12345G", "#123456;x:y", "\"};alert(1)//"] {
-            var settings = ReaderSettings()
-            settings.primaryColor = value
-            XCTAssertNil(settings.sanitized().primaryColor, value)
+            XCTAssertFalse(ReaderSettings.isValidColor(value), value)
         }
     }
 
@@ -92,7 +89,7 @@ final class ReaderSettingsTests: XCTestCase {
         XCTAssertTrue(ReaderSettings.isValidColor("#aBc123"))
     }
 
-    func testJavaScriptArgumentOmitsMissingColor() {
+    func testJavaScriptArgumentHasNoColor() {
         XCTAssertFalse(ReaderSettings().javaScriptArgument().contains("primaryColor"))
     }
 }

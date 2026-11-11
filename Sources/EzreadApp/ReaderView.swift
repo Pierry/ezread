@@ -72,6 +72,11 @@ final class ReaderView: NSView {
         }
     }
 
+    func setPrimaryColor(_ color: String?) {
+        let argument = color.flatMap(Self.jsonString) ?? "null"
+        run("ezread.setPrimaryColor(\(argument)); true")
+    }
+
     func showAttentionLoading() {
         run("ezread.showAttentionLoading(); true")
     }

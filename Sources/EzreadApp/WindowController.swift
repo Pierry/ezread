@@ -156,6 +156,13 @@ final class WindowController: NSWindowController, NSWindowDelegate, NSMenuItemVa
     }
 
     private func connectCallbacks() {
+        sidebar.settings.onPickColor = { [weak self] color in
+            guard let self, let file = self.session?.url else { return }
+            self.reader.setPrimaryColor(color)
+            if !DocumentColor.write(color, to: file) {
+                self.showError("Could not save the color for this document.", file.path)
+            }
+        }
         tree.onSelect = { [weak self] path in self?.open(relativePath: path, fragment: nil) }
         reader.onInternalLink = { [weak self] path, fragment in self?.open(relativePath: path, fragment: fragment) }
         reader.onTopLineChanged = { [weak self] line in
@@ -240,6 +247,9 @@ final class WindowController: NSWindowController, NSWindowDelegate, NSMenuItemVa
 
         session = next
         renderedText = nil
+        let color = DocumentColor.read(from: file)
+        reader.setPrimaryColor(color)
+        sidebar.settings.show(documentColor: color, enabled: true)
         window?.title = file.lastPathComponent
         window?.representedURL = file
         showReaderPane()

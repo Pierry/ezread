@@ -13,7 +13,13 @@ final class SettingsPanel: NSView {
     private let lineHeight = NSSlider()
     private let lineHeightValue = SettingsPanel.valueLabel()
     private let bold = NSButton(checkboxWithTitle: "Bold", target: nil, action: nil)
-    private let color = NSColorWell(style: .default)
+    private let swatches = ColorSwatches()
+
+    /// Called when a color is picked for the open document. nil is the default.
+    var onPickColor: ((String?) -> Void)? {
+        get { swatches.onPick }
+        set { swatches.onPick = newValue }
+    }
 
     private static let themes: [(String, ReaderSettings.Appearance?)] = [
         ("System", nil),
@@ -61,13 +67,7 @@ final class SettingsPanel: NSView {
         configure(letterSpacing, ReaderSettings.letterSpacingRange)
         configure(lineHeight, ReaderSettings.lineHeightRange)
 
-        color.target = self
-        color.action = #selector(controlChanged)
-        color.supportsAlpha = false
-        let useDefaultColor = NSButton(title: "Default", target: self, action: #selector(resetColor))
-        useDefaultColor.controlSize = .small
-        let colorRow = NSStackView(views: [color, useDefaultColor])
-        colorRow.spacing = 10
+        swatches.isEnabled = false
 
         let reset = NSButton(title: "Restore Defaults", target: self, action: #selector(resetAll))
         reset.controlSize = .small
@@ -80,9 +80,9 @@ final class SettingsPanel: NSView {
         addSlider("Size", fontSizeValue, fontSize)
         addSlider("Letter spacing", letterSpacingValue, letterSpacing)
         addSlider("Line height", lineHeightValue, lineHeight)
-        addHeader("Primary color", nil)
-        stack.addArrangedSubview(colorRow)
-        stack.setCustomSpacing(20, after: colorRow)
+        addHeader("Color for this document", nil)
+        stack.addArrangedSubview(swatches)
+        stack.setCustomSpacing(20, after: swatches)
         stack.addArrangedSubview(reset)
 
         NotificationCenter.default.addObserver(self, selector: #selector(refresh), name: .readerSettingsChanged, object: nil)
@@ -151,7 +151,7 @@ final class SettingsPanel: NSView {
         letterSpacingValue.stringValue = String(format: "%.3f em", settings.letterSpacing)
         lineHeight.doubleValue = settings.lineHeight
         lineHeightValue.stringValue = String(format: "%.2f", settings.lineHeight)
-        color.color = settings.primaryColor.flatMap(Self.color(fromHex:)) ?? Theme.text
+        swatches.needsDisplay = true
     }
 
     @objc private func controlChanged(_ sender: Any?) {
@@ -162,33 +162,16 @@ final class SettingsPanel: NSView {
         settings.fontSize = fontSize.doubleValue.rounded()
         settings.letterSpacing = (letterSpacing.doubleValue * 1000).rounded() / 1000
         settings.lineHeight = (lineHeight.doubleValue * 100).rounded() / 100
-        if sender as? NSColorWell === color {
-            settings.primaryColor = Self.hex(from: color.color)
-        }
         SettingsStore.current = settings
-    }
-
-    @objc private func resetColor() {
-        SettingsStore.current.primaryColor = nil
     }
 
     @objc private func resetAll() {
         SettingsStore.current = ReaderSettings()
     }
 
-    private static func hex(from color: NSColor) -> String? {
-        guard let rgb = color.usingColorSpace(.sRGB) else { return nil }
-        let value = { (component: CGFloat) in Int((component * 255).rounded()) }
-        return String(format: "#%02X%02X%02X", value(rgb.redComponent), value(rgb.greenComponent), value(rgb.blueComponent))
-    }
-
-    private static func color(fromHex hex: String) -> NSColor? {
-        guard let value = Int(hex.dropFirst(), radix: 16) else { return nil }
-        return NSColor(
-            srgbRed: CGFloat((value >> 16) & 0xFF) / 255,
-            green: CGFloat((value >> 8) & 0xFF) / 255,
-            blue: CGFloat(value & 0xFF) / 255,
-            alpha: 1
-        )
+    /// Shows the open document's color. Disabled when no document is open.
+    func show(documentColor: String?, enabled: Bool) {
+        swatches.selected = documentColor
+        swatches.isEnabled = enabled
     }
 }

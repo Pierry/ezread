@@ -6,7 +6,7 @@ final class SidebarView: NSView {
     private static let footerHeight: CGFloat = 40
 
     let tree = FileTreeView()
-    private let settings = SettingsPanel()
+    let settings = SettingsPanel()
     private let gear = NSButton()
 
     override init(frame: NSRect) {

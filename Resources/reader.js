@@ -71,7 +71,7 @@ window.ezread = (() => {
     return best ? lineOf(best) : 1;
   }
 
-  let lastSettings = null;
+  let primaryColor = null;
   const darkTheme = window.matchMedia("(prefers-color-scheme: dark)");
 
   function luminance(hex) {
@@ -94,7 +94,7 @@ window.ezread = (() => {
 
   function applyPrimary() {
     const root = document.documentElement;
-    const color = lastSettings && lastSettings.primaryColor;
+    const color = primaryColor;
     if (color && isReadable(color)) root.style.setProperty("--primary", color);
     else root.style.removeProperty("--primary");
   }
@@ -180,7 +180,11 @@ window.ezread = (() => {
       root.dataset.bold = settings.bold ? "true" : "false";
       if (settings.appearance) root.dataset.theme = settings.appearance;
       else delete root.dataset.theme;
-      lastSettings = settings;
+      applyPrimary();
+    },
+
+    setPrimaryColor(color) {
+      primaryColor = typeof color === "string" && /^#[0-9a-f]{6}$/i.test(color) ? color : null;
       applyPrimary();
     },
 

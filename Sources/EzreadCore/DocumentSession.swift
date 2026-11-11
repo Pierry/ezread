@@ -37,7 +37,10 @@ public final class DocumentSession {
         if !force && changedOnDisk() { return .conflict }
 
         let permissions = try? FileManager.default.attributesOfItem(atPath: url.path)[.posixPermissions]
+        // An atomic write replaces the file and would drop its attributes.
+        let color = DocumentColor.read(from: url)
         try text.write(to: url, atomically: true, encoding: .utf8)
+        if let color { DocumentColor.write(color, to: url) }
         if let permissions {
             try? FileManager.default.setAttributes([.posixPermissions: permissions as Any], ofItemAtPath: url.path)
         }
