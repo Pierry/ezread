@@ -97,9 +97,19 @@ to go back to the page.
 
 ## Make it yours
 
-Open Settings at the bottom of the sidebar to choose the theme, font, size,
-letter spacing, line height and the color of your headings and links. Changes
-show up as you make them, and ezread remembers them.
+Open Settings at the bottom of the sidebar to choose the theme, font, bold,
+size, letter spacing and line height. Changes show up as you make them, and
+ezread remembers them. Each document can also get its own color for headings
+and links; it starts black and is saved with the file.
+
+Four themes: Light, Dark, Solarized Light and Solarized Dark.
+
+<p>
+  <img src="docs/assets/theme-light.png" width="49%" alt="ezread in the Light theme">
+  <img src="docs/assets/theme-dark.png" width="49%" alt="ezread in the Dark theme">
+  <img src="docs/assets/theme-solarized-light.png" width="49%" alt="ezread in the Solarized Light theme">
+  <img src="docs/assets/theme-solarized-dark.png" width="49%" alt="ezread in the Solarized Dark theme">
+</p>
 
 ![The settings in the ezread sidebar](docs/assets/settings.png)
 

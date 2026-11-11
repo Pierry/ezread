@@ -79,6 +79,12 @@ section { padding: 72px 0; }
 .window { display: block; width: 100%; height: auto; border: 2px solid var(--ink); border-radius: 18px; background: var(--card); }
 [hidden] { display: none !important; }
 
+.themes { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px; margin: 28px 0 0; padding: 0; list-style: none; }
+.themes figure { margin: 0; }
+.themes img { display: block; width: 100%; height: auto; }
+.themes figcaption { margin-top: 10px; font-size: 15px; font-weight: 600; text-align: center; }
+@media (max-width: 760px) { .themes { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
 .demo { display: grid; grid-template-columns: 300px minmax(0, 1fr); background: var(--card); border: 2px solid var(--ink); border-radius: 18px; overflow: hidden; }
 .controls { padding: 28px; background: var(--blue-soft); border-right: 2px solid var(--ink); }
 .control { display: block; margin-bottom: 22px; font-weight: 600; font-size: 15px; }
@@ -177,6 +183,12 @@ footer { padding: 40px 0 64px; color: var(--muted); font-size: 16px; }
       </div>
       <img class="window" id="shot-light" src="assets/light.png" width="2080" height="1600" alt="ezread window in the light theme, with the file list on the left and a document in a central column.">
       <img class="window" id="shot-dark" src="assets/dark.png" width="2080" height="1600" alt="ezread window in the dark theme, with the file list on the left and a document in a central column." hidden>
+      <ul class="themes" aria-label="Themes">
+        <li><figure><img src="assets/theme-light.png" width="720" height="524" loading="lazy" alt="ezread in the Light theme"><figcaption>Light</figcaption></figure></li>
+        <li><figure><img src="assets/theme-dark.png" width="720" height="524" loading="lazy" alt="ezread in the Dark theme"><figcaption>Dark</figcaption></figure></li>
+        <li><figure><img src="assets/theme-solarized-light.png" width="720" height="524" loading="lazy" alt="ezread in the Solarized Light theme"><figcaption>Solarized Light</figcaption></figure></li>
+        <li><figure><img src="assets/theme-solarized-dark.png" width="720" height="524" loading="lazy" alt="ezread in the Solarized Dark theme"><figcaption>Solarized Dark</figcaption></figure></li>
+      </ul>
     </section>
 
     <section aria-labelledby="demo-title">
