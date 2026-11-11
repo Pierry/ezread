@@ -1,6 +1,6 @@
 "use strict";
 
-window.zread = (() => {
+window.ezread = (() => {
   const TOP_OFFSET = 56;
   let highlightLoading = null;
 
@@ -27,7 +27,7 @@ window.zread = (() => {
     if (!highlightLoading) {
       highlightLoading = new Promise((resolve, reject) => {
         const script = document.createElement("script");
-        script.src = "zread://app/vendor/highlight.min.js";
+        script.src = "ezread://app/vendor/highlight.min.js";
         script.onload = resolve;
         script.onerror = reject;
         document.head.appendChild(script);
@@ -85,7 +85,8 @@ window.zread = (() => {
   // A color picked in one theme can vanish in the other, so it applies only
   // when it stays readable on the current background.
   function isReadable(hex) {
-    const background = luminance(darkTheme.matches ? "#0A0A0A" : "#F0EEE9");
+    const current = getComputedStyle(document.documentElement).getPropertyValue("--background").trim();
+    const background = luminance(/^#[0-9a-f]{6}$/i.test(current) ? current : darkTheme.matches ? "#0A0A0A" : "#F0EEE9");
     const color = luminance(hex);
     const contrast = (Math.max(color, background) + 0.05) / (Math.min(color, background) + 0.05);
     return contrast >= 2;
@@ -112,7 +113,7 @@ window.zread = (() => {
   let scrollTimer = null;
   window.addEventListener("scroll", () => {
     clearTimeout(scrollTimer);
-    scrollTimer = setTimeout(() => window.webkit.messageHandlers.zreadScroll.postMessage(topLine()), 300);
+    scrollTimer = setTimeout(() => window.webkit.messageHandlers.ezreadScroll.postMessage(topLine()), 300);
   });
 
   const ATTENTION_TITLE = "What needs your attention";
@@ -176,6 +177,9 @@ window.zread = (() => {
       root.style.setProperty("--reader-line-height", String(settings.lineHeight));
       root.style.setProperty("--reader-tracking", `${settings.letterSpacing}em`);
       root.dataset.fontStyle = settings.fontStyle;
+      root.dataset.bold = settings.bold ? "true" : "false";
+      if (settings.appearance) root.dataset.theme = settings.appearance;
+      else delete root.dataset.theme;
       lastSettings = settings;
       applyPrimary();
     },

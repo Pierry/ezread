@@ -1,5 +1,5 @@
 import AppKit
-import ZreadCore
+import EzreadCore
 
 /// Reader typography controls, shown inside the sidebar.
 final class SettingsPanel: NSView {
@@ -12,7 +12,21 @@ final class SettingsPanel: NSView {
     private let letterSpacingValue = SettingsPanel.valueLabel()
     private let lineHeight = NSSlider()
     private let lineHeightValue = SettingsPanel.valueLabel()
-    private let color = NSColorWell(style: .minimal)
+    private let bold = NSButton(checkboxWithTitle: "Bold", target: nil, action: nil)
+    private let color = NSColorWell(style: .default)
+
+    private static let themes: [(String, ReaderSettings.Appearance?)] = [
+        ("System", nil),
+        ("Light", .light),
+        ("Dark", .dark),
+        ("Solarized Light", .solarizedLight),
+        ("Solarized Dark", .solarizedDark),
+    ]
+    private static let fonts: [(String, ReaderSettings.FontStyle)] = [
+        ("Source Serif", .medium),
+        ("Charter", .charter),
+        ("Monospaced", .monospaced),
+    ]
 
     override init(frame: NSRect) {
         super.init(frame: frame)
@@ -29,13 +43,19 @@ final class SettingsPanel: NSView {
             stack.trailingAnchor.constraint(equalTo: trailingAnchor),
         ])
 
-        theme.addItems(withTitles: ["System", "Light", "Dark"])
+        theme.addItems(withTitles: Self.themes.map(\.0))
         theme.target = self
         theme.action = #selector(controlChanged)
 
-        fontStyle.addItems(withTitles: ["Serif", "Monospaced"])
+        fontStyle.addItems(withTitles: Self.fonts.map(\.0))
         fontStyle.target = self
         fontStyle.action = #selector(controlChanged)
+
+        bold.target = self
+        bold.action = #selector(controlChanged)
+        bold.font = NSFont(name: "Helvetica Neue", size: 13)
+        let fontRow = NSStackView(views: [fontStyle, bold])
+        fontRow.spacing = 12
 
         configure(fontSize, ReaderSettings.fontSizeRange)
         configure(letterSpacing, ReaderSettings.letterSpacingRange)
@@ -43,6 +63,7 @@ final class SettingsPanel: NSView {
 
         color.target = self
         color.action = #selector(controlChanged)
+        color.supportsAlpha = false
         let useDefaultColor = NSButton(title: "Default", target: self, action: #selector(resetColor))
         useDefaultColor.controlSize = .small
         let colorRow = NSStackView(views: [color, useDefaultColor])
@@ -55,7 +76,7 @@ final class SettingsPanel: NSView {
         stack.addArrangedSubview(theme)
         stack.setCustomSpacing(16, after: theme)
         addHeader("Font", nil)
-        stack.addArrangedSubview(fontStyle)
+        stack.addArrangedSubview(fontRow)
         addSlider("Size", fontSizeValue, fontSize)
         addSlider("Letter spacing", letterSpacingValue, letterSpacing)
         addSlider("Line height", lineHeightValue, lineHeight)
@@ -121,8 +142,9 @@ final class SettingsPanel: NSView {
 
     @objc private func refresh() {
         let settings = SettingsStore.current
-        theme.selectItem(at: settings.appearance == nil ? 0 : (settings.appearance == .light ? 1 : 2))
-        fontStyle.selectItem(at: settings.fontStyle == .medium ? 0 : 1)
+        theme.selectItem(at: Self.themes.firstIndex { $0.1 == settings.appearance } ?? 0)
+        fontStyle.selectItem(at: Self.fonts.firstIndex { $0.1 == settings.fontStyle } ?? 0)
+        bold.state = settings.bold ? .on : .off
         fontSize.doubleValue = settings.fontSize
         fontSizeValue.stringValue = String(format: "%.0f px", settings.fontSize)
         letterSpacing.doubleValue = settings.letterSpacing
@@ -134,8 +156,9 @@ final class SettingsPanel: NSView {
 
     @objc private func controlChanged(_ sender: Any?) {
         var settings = SettingsStore.current
-        settings.appearance = [nil, .light, .dark][theme.indexOfSelectedItem]
-        settings.fontStyle = fontStyle.indexOfSelectedItem == 0 ? .medium : .monospaced
+        settings.appearance = Self.themes[max(0, theme.indexOfSelectedItem)].1
+        settings.fontStyle = Self.fonts[max(0, fontStyle.indexOfSelectedItem)].1
+        settings.bold = bold.state == .on
         settings.fontSize = fontSize.doubleValue.rounded()
         settings.letterSpacing = (letterSpacing.doubleValue * 1000).rounded() / 1000
         settings.lineHeight = (lineHeight.doubleValue * 100).rounded() / 100

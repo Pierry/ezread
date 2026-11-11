@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>zread</title>
-<meta name="description" content="A Markdown reader for macOS. Run zread . in a repository and read the docs as articles.">
+<title>ezread</title>
+<meta name="description" content="A Markdown reader for macOS. Run ezread . in a repository and read the docs as articles.">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -52,7 +52,7 @@ code, kbd, .command { font-family: "JetBrains Mono", Menlo, monospace; }
 .brand { display: flex; align-items: center; gap: 12px; font: 500 24px/1 Newsreader, serif; color: var(--ink); text-decoration: none; }
 .brand svg { display: block; }
 .mark-tile { fill: var(--blue-soft); stroke: var(--ink); stroke-width: 3.5; }
-.mark-z { fill: none; stroke: var(--ink); stroke-width: 6; stroke-linecap: round; stroke-linejoin: round; }
+.mark-z { fill: none; stroke: var(--ink); stroke-width: 5; stroke-linecap: round; stroke-linejoin: round; }
 
 .hero { padding: 56px 0 72px; }
 h1, h2 { font-family: Newsreader, serif; font-weight: 400; margin: 0; letter-spacing: -0.02em; }
@@ -135,36 +135,36 @@ footer { padding: 40px 0 64px; color: var(--muted); font-size: 16px; }
 <div class="page">
   <header class="top">
     <a class="brand" href="./">
-      <svg width="38" height="38" viewBox="0 0 64 64" aria-hidden="true"><rect class="mark-tile" x="2" y="2" width="60" height="60" rx="17"/><path class="mark-z" d="M21 21H43L21 43H43"/></svg>
-      zread
+      <svg width="38" height="38" viewBox="0 0 64 64" aria-hidden="true"><rect class="mark-tile" x="2" y="2" width="60" height="60" rx="17"/><path class="mark-z" d="M13.5 32H30.5A8.5 8.5 0 1 0 28 38"/><path class="mark-z" d="M36 23.5H50.5L36 40.5H50.5"/></svg>
+      ezread
     </a>
-    <a href="https://github.com/Pierry/zread">Code on GitHub</a>
+    <a href="https://github.com/Pierry/ezread">Code on GitHub</a>
   </header>
 
   <main>
     <div class="hero">
       <h1>Read your repo's docs like articles.</h1>
-      <p class="lead">zread is a Mac app that opens straight into rendered text. Run <code>zread .</code> in any folder and browse its Markdown. Editing is one shortcut away and stays out of your reading.</p>
+      <p class="lead">ezread is a Mac app that opens straight into rendered text. Run <code>ezread .</code> in any folder and browse its Markdown. Editing is one shortcut away and stays out of your reading.</p>
       <div class="command">
-        <code id="install">brew install pierry/zread/zread</code>
+        <code id="install">brew install pierry/ezread/ezread</code>
         <button type="button" id="copy">Copy</button>
       </div>
     </div>
 
     <section aria-labelledby="perf-title">
       <h2 id="perf-title" class="perf-head">Light on purpose.</h2>
-      <p class="perf-lead">zread opens as fast as Zed, uses about half of its memory, and takes up 1 MB on disk.</p>
+      <p class="perf-lead">ezread opens as fast as Zed, uses about half of its memory, and takes up 1 MB on disk.</p>
       <div class="perf-panel">
         <table class="perf">
           <thead><tr><th scope="col">App</th><th scope="col">Window on screen</th><th scope="col">Memory</th><th scope="col">Size on disk</th></tr></thead>
           <tbody>
-            <tr class="ours"><th scope="row">zread 0.1.2</th><td>395<span>ms</span></td><td>203<span>MB</span></td><td>1<span>MB</span></td></tr>
+            <tr class="ours"><th scope="row">ezread 0.1.2</th><td>395<span>ms</span></td><td>203<span>MB</span></td><td>1<span>MB</span></td></tr>
             <tr><th scope="row">Zed 1.27.0</th><td>398<span>ms</span></td><td>396<span>MB</span></td><td>176<span>MB</span></td></tr>
             <tr><th scope="row">Ghostty 1.3.1</th><td>513<span>ms</span></td><td>594<span>MB</span></td><td>62<span>MB</span></td></tr>
           </tbody>
         </table>
       </div>
-      <p class="note">Measured on one M4 Pro with macOS 26.3.1. Each number is the median of five warm launches, with zread and Zed opening a 400-section document and Ghostty opening an empty window with its existing config. Memory is physical footprint six seconds after launch, and includes the WebKit helpers zread relies on. These apps do different jobs: Zed is a full editor, Ghostty is a terminal, and zread stays small because WebKit already ships with macOS.</p>
+      <p class="note">Measured on one M4 Pro with macOS 26.3.1. Each number is the median of five warm launches, with ezread and Zed opening a 400-section document and Ghostty opening an empty window with its existing config. Memory is physical footprint six seconds after launch, and includes the WebKit helpers ezread relies on. These apps do different jobs: Zed is a full editor, Ghostty is a terminal, and ezread stays small because WebKit already ships with macOS.</p>
     </section>
 
     <section aria-labelledby="shots-title">
@@ -175,8 +175,8 @@ footer { padding: 40px 0 64px; color: var(--muted); font-size: 16px; }
           <button type="button" id="show-dark" aria-pressed="false">Dark</button>
         </div>
       </div>
-      <img class="window" id="shot-light" src="assets/light.png" width="2080" height="1600" alt="zread window in the light theme, with the file list on the left and a document in a central column.">
-      <img class="window" id="shot-dark" src="assets/dark.png" width="2080" height="1600" alt="zread window in the dark theme, with the file list on the left and a document in a central column." hidden>
+      <img class="window" id="shot-light" src="assets/light.png" width="2080" height="1600" alt="ezread window in the light theme, with the file list on the left and a document in a central column.">
+      <img class="window" id="shot-dark" src="assets/dark.png" width="2080" height="1600" alt="ezread window in the dark theme, with the file list on the left and a document in a central column." hidden>
     </section>
 
     <section aria-labelledby="demo-title">
@@ -216,14 +216,14 @@ footer { padding: 40px 0 64px; color: var(--muted); font-size: 16px; }
       <div>
         <h2>Install in two commands.</h2>
         <ol>
-          <li><code>brew install pierry/zread/zread</code> builds the app on your Mac. Needs macOS 14 or later and Xcode.</li>
-          <li><code>zread .</code> opens the current folder. For one file, use <code>zread docs/design.md</code>.</li>
+          <li><code>brew install pierry/ezread/ezread</code> builds the app on your Mac. Needs macOS 14 or later and Xcode.</li>
+          <li><code>ezread .</code> opens the current folder. For one file, use <code>ezread docs/design.md</code>.</li>
         </ol>
-        <p class="note">zread is not notarized by Apple yet. Building locally avoids the macOS warning. A downloaded <code>.app</code> stays blocked until you run <code>xattr -dr com.apple.quarantine zread.app</code>, so do that only for a source you trust.</p>
+        <p class="note">ezread is not notarized by Apple yet. Building locally avoids the macOS warning. A downloaded <code>.app</code> stays blocked until you run <code>xattr -dr com.apple.quarantine ezread.app</code>, so do that only for a source you trust.</p>
         <h2>Update by hand.</h2>
-        <p><code>brew update &amp;&amp; brew upgrade pierry/zread/zread</code></p>
-        <p><strong>This command is the only way to get a new version.</strong> zread runs entirely offline: it never connects to the internet, so it can't check for updates or tell you that one exists.</p>
-        <p class="note">The one exception is the What matters? button. Only when you click it, zread runs your own Claude Code, which sends the open document to Anthropic under your account.</p>
+        <p><code>brew update &amp;&amp; brew upgrade pierry/ezread/ezread</code></p>
+        <p><strong>This command is the only way to get a new version.</strong> ezread runs entirely offline: it never connects to the internet, so it can't check for updates or tell you that one exists.</p>
+        <p class="note">The one exception is the What matters? button. Only when you click it, ezread runs your own Claude Code, which sends the open document to Anthropic under your account.</p>
       </div>
       <div>
         <h2>Shortcuts.</h2>
@@ -239,11 +239,11 @@ footer { padding: 40px 0 64px; color: var(--muted); font-size: 16px; }
 
     <section aria-labelledby="safe-title">
       <h2 id="safe-title">Safe for someone else's repo.</h2>
-      <p class="note">zread runs nothing that comes from Markdown. Raw HTML is dropped, remote images do not load, and the app reads images only from inside the open folder. Some READMEs pay for this: remote badges disappear.</p>
+      <p class="note">ezread runs nothing that comes from Markdown. Raw HTML is dropped, remote images do not load, and the app reads images only from inside the open folder. Some READMEs pay for this: remote badges disappear.</p>
     </section>
   </main>
 
-  <footer>Open source under the MIT license. <a href="https://github.com/Pierry/zread">Read the code and open issues on GitHub</a>.</footer>
+  <footer>Open source under the MIT license. <a href="https://github.com/Pierry/ezread">Read the code and open issues on GitHub</a>.</footer>
 </div>
 
 <script>

@@ -1,5 +1,5 @@
 import AppKit
-import ZreadCore
+import EzreadCore
 
 private final class TreeItem {
     let node: FileNode

@@ -1,9 +1,9 @@
 import XCTest
-@testable import ZreadCore
+@testable import EzreadCore
 
 final class WindowStateTests: XCTestCase {
     private var defaults: UserDefaults!
-    private let suite = "zread.tests.\(UUID().uuidString)"
+    private let suite = "ezread.tests.\(UUID().uuidString)"
 
     override func setUp() {
         defaults = UserDefaults(suiteName: suite)

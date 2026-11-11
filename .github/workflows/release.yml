@@ -25,5 +25,5 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          ditto -c -k --keepParent build/zread.app "zread-$GITHUB_REF_NAME-macos.zip"
-          gh release create "$GITHUB_REF_NAME" "zread-$GITHUB_REF_NAME-macos.zip" --generate-notes --verify-tag
+          ditto -c -k --keepParent build/ezread.app "ezread-$GITHUB_REF_NAME-macos.zip"
+          gh release create "$GITHUB_REF_NAME" "ezread-$GITHUB_REF_NAME-macos.zip" --generate-notes --verify-tag

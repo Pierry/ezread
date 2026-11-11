@@ -9,7 +9,7 @@ public struct RenderedDocument: Equatable {
 }
 
 public enum MarkdownRenderer {
-    public static let rootURLPrefix = "zread://root/"
+    public static let rootURLPrefix = "ezread://root/"
 
     /// Converts Markdown to an HTML fragment. Raw HTML is dropped because the
     /// unsafe option is not set. `documentDirectory` is the document's folder

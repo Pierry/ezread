@@ -1,6 +1,6 @@
 #!/bin/bash
 # Fails when line coverage of Sources/ falls below the threshold (default 90).
-# Only ZreadCore is linked into the tests; the AppKit layer is not measured.
+# Only EzreadCore is linked into the tests; the AppKit layer is not measured.
 set -euo pipefail
 
 cd "$(dirname "$0")/.."

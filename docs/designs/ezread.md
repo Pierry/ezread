@@ -1,4 +1,4 @@
-# zread
+# ezread
 
 *   **Author:** Pierry Borges
 *   **Status:** Draft
@@ -8,14 +8,14 @@
 
 ## Overview
 
-zread is a macOS app that opens a project folder from the terminal
-(`zread .`) and shows its Markdown files as articles to read. The default
+ezread is a macOS app that opens a project folder from the terminal
+(`ezread .`) and shows its Markdown files as articles to read. The default
 screen is the rendered text in a single column, with typography and components
 inspired by reading on Medium. Editing exists but is secondary: one shortcut
 switches the screen to the raw text, and another saves.
 
 The relationship with Zed is inverted. Zed opens on code and can show a preview.
-zread opens on reading and can show the Markdown source.
+ezread opens on reading and can show the Markdown source.
 
 ## The Problem
 
@@ -26,7 +26,7 @@ surround the text.
 
 Adjusting this inside the editor solves only part of it. VS Code accepts custom
 CSS in the preview (`markdown.styles`), which improves the typography, but the
-preview is still a panel inside an editor. zread is justified only by what a
+preview is still a panel inside an editor. ezread is justified only by what a
 theme cannot deliver: a window made only for reading, opened directly from the
 terminal, in which the rendered text is the initial screen.
 
@@ -38,7 +38,7 @@ fix what is noticed during reading.
 
 **Opening**
 
-*   `zread .` opens the current folder, and `zread caminho/arquivo.md` opens
+*   `ezread .` opens the current folder, and `ezread caminho/arquivo.md` opens
     directly on that file.
 *   When opening a folder, the first file shown is the root `README.md`. Without
     a README, the screen shows the file tree.
@@ -61,7 +61,7 @@ fix what is noticed during reading.
 
 *   The tree lists only the folders that contain Markdown.
 *   `.git`, `node_modules`, and folders listed in `.gitignore` do not appear.
-*   A relative link between Markdown files opens the target inside zread.
+*   A relative link between Markdown files opens the target inside ezread.
     Anchors (`#secao`) scroll to the heading. An external link opens in the
     default browser.
 *   An image with a relative path is loaded from the repository.
@@ -87,7 +87,7 @@ fix what is noticed during reading.
 
 **Lightness (proposed targets, not yet measured)**
 
-*   From Enter on `zread .` to text on screen: up to 500 ms on Apple Silicon,
+*   From Enter on `ezread .` to text on screen: up to 500 ms on Apple Silicon,
     with the app closed.
 *   Installed app: up to 30 MB.
 *   Memory with one document open: up to 200 MB, adding up all the app's
@@ -128,7 +128,7 @@ None open. Decisions made during drafting:
 ### CUJ 1: Read a project's docs
 
 *   **Given**: a terminal in a repository folder with `README.md` and `docs/`.
-*   **When**: the user runs `zread .` and clicks a relative link in the README.
+*   **When**: the user runs `ezread .` and clicks a relative link in the README.
 *   **Then**: the README appears in reading mode, and the linked document opens
     in the same window, also in reading mode.
 
@@ -149,16 +149,16 @@ None open. Decisions made during drafting:
 
 ## Technical Plan (Architecture)
 
-zread is an AppKit app in Swift, without a sandbox, distributed outside the App
+ezread is an AppKit app in Swift, without a sandbox, distributed outside the App
 Store. It converts Markdown to HTML with cmark-gfm and shows the result in a
 single `WKWebView`. Source mode is a plain text `NSTextView`, placed where the
 WebView was.
 
 ```text
-terminal: zread .
+terminal: ezread .
    |
    v
-CLI (zread)  -- absolute path -->  open -b <bundle id> <path>
+CLI (ezread)  -- absolute path -->  open -b <bundle id> <path>
                                          |
                                          v
                               AppDelegate / WindowController
@@ -172,7 +172,7 @@ CLI (zread)  -- absolute path -->  open -b <bundle id> <path>
                                  v                    v
                          ReaderView (WKWebView)   FileTree (sidebar)
                           |            ^
-              link click  |            | zread:// (images, CSS, JS)
+              link click  |            | ezread:// (images, CSS, JS)
                           v            |
                      LinkRouter    LocalScheme (only inside the root)
 
@@ -201,7 +201,7 @@ WebKit already in the disk cache. The first run after a boot can exceed it.
 
 ### Components
 
-*   **`zread` CLI**: small binary inside the bundle. Resolves the argument to an
+*   **`ezread` CLI**: small binary inside the bundle. Resolves the argument to an
     absolute path and asks macOS to open the app with it, via `open -b`.
     Repeating the command with the app open reuses the running instance. The
     command reaches the `PATH` through a symlink in `/usr/local/bin`, created by
@@ -222,10 +222,10 @@ WebKit already in the disk cache. The first run after a boot can exceed it.
     --exclude-standard` filtering `*.md` and `*.markdown`, which already respects
     `.gitignore`. Outside git, walks the folder ignoring `.git` and
     `node_modules`. Runs after the first text, so as not to delay opening.
-*   **LocalScheme**: `WKURLSchemeHandler` for `zread://`. Serves images relative
+*   **LocalScheme**: `WKURLSchemeHandler` for `ezread://`. Serves images relative
     to the root and refuses any path that, once resolved, leaves it.
 *   **LinkRouter**: decides each WebView navigation. A Markdown file inside the
-    root opens in zread, `#ancora` scrolls within the page, and `http(s)` and
+    root opens in ezread, `#ancora` scrolls within the page, and `http(s)` and
     `mailto` go to the system.
 *   **SourceEditor**: plain text `NSTextView`, Menlo, no highlighting. Keeps the
     unsaved change state and asks for confirmation when switching files or
@@ -251,7 +251,7 @@ sandbox. Therefore:
     cost is real: READMEs with `<img>` of defined width, `<details>`, or HTML
     alignment lose those elements.
 *   A Content-Security-Policy allows script, style, and image only from
-    `zread://`. Remote images are blocked, which prevents opening a document from
+    `ezread://`. Remote images are blocked, which prevents opening a document from
     notifying an external server, and also means README badges do not appear.
 *   `LocalScheme` restricts reading to the open root.
 
@@ -334,7 +334,7 @@ drafting. Only WKWebView was measured. The other numbers are estimates.
 
 New project: the directory is empty and is not a git repository. All files are
 created. Requirements: macOS 14 or later, Swift Package Manager, bundle id
-`com.pierryborges.zread`, app without a sandbox. Only external code dependency:
+`com.pierryborges.ezread`, app without a sandbox. Only external code dependency:
 `swift-cmark` (`gfm` branch, from `swiftlang/swift-cmark`).
 
 ### Target Files to Create/Modify
@@ -342,20 +342,20 @@ created. Requirements: macOS 14 or later, Swift Package Manager, bundle id
 #### 1. `./Package.swift` (Create)
 
 *   **Type / Scope**: Build.
-*   **Proposed Changes**: Executable targets `ZreadApp` and `zread-cli`, library
-    target `ZreadCore` for the testable logic, test target, and a dependency on
-    `swift-cmark`. Separating `ZreadCore` allows testing without opening a
+*   **Proposed Changes**: Executable targets `EzreadApp` and `ezread-cli`, library
+    target `EzreadCore` for the testable logic, test target, and a dependency on
+    `swift-cmark`. Separating `EzreadCore` allows testing without opening a
     window.
 
-#### 2. `./Sources/ZreadCore/MarkdownRenderer.swift` (Create)
+#### 2. `./Sources/EzreadCore/MarkdownRenderer.swift` (Create)
 
 *   **Type / Scope**: Library.
 *   **Proposed Changes**: `render(markdown: String) -> RenderedDocument`, with
     the HTML and the `hasCode` information. Uses cmark-gfm with table, task list,
     strikethrough, autolink, and source position. Without the unsafe option, to
-    discard raw HTML. Rewrites `src` of relative images to `zread://`.
+    discard raw HTML. Rewrites `src` of relative images to `ezread://`.
 
-#### 3. `./Sources/ZreadCore/RepoScanner.swift` (Create)
+#### 3. `./Sources/EzreadCore/RepoScanner.swift` (Create)
 
 *   **Type / Scope**: Library.
 *   **Proposed Changes**: `scan(root: URL) async -> [FileNode]`. With `.git` in
@@ -364,35 +364,35 @@ created. Requirements: macOS 14 or later, Swift Package Manager, bundle id
     `.md` and `.markdown`, and returns a tree with only the folders that contain
     those files.
 
-#### 4. `./Sources/ZreadCore/RootResolver.swift` (Create)
+#### 4. `./Sources/EzreadCore/RootResolver.swift` (Create)
 
 *   **Type / Scope**: Library.
 *   **Proposed Changes**: From the argument, returns `root` and the initial file.
     Folder: it is the root, with `README.md` as the initial file, if it exists.
     File: walks up until it finds `.git`, or uses the file's folder as the root.
 
-#### 5. `./Sources/ZreadCore/PathGuard.swift` (Create)
+#### 5. `./Sources/EzreadCore/PathGuard.swift` (Create)
 
 *   **Type / Scope**: Library, security.
 *   **Proposed Changes**: `resolve(request:, root:) -> URL?`. Resolves symlinks
     and `..`, and returns nil if the result leaves the root. Used by
     `LocalScheme` and `LinkRouter`.
 
-#### 6. `./Sources/ZreadCore/LinkClassifier.swift` (Create)
+#### 6. `./Sources/EzreadCore/LinkClassifier.swift` (Create)
 
 *   **Type / Scope**: Library.
 *   **Proposed Changes**: Classifies a link as `internalMarkdown`, `anchor`,
     `external`, or `blocked`, without depending on AppKit. Only `http`, `https`,
     and `mailto` are external.
 
-#### 7. `./Sources/ZreadCore/DocumentSession.swift` (Create)
+#### 7. `./Sources/EzreadCore/DocumentSession.swift` (Create)
 
 *   **Type / Scope**: Library.
 *   **Proposed Changes**: Keeps the path, text, loaded modification date, and
     unsaved change state. Exposes `load()`, `save()`, which signals a conflict if
     the disk changed, and `changedOnDisk()`. Saves by atomic write.
 
-#### 8. `./Sources/ZreadApp/main.swift` and `./Sources/ZreadApp/AppDelegate.swift` (Create)
+#### 8. `./Sources/EzreadApp/main.swift` and `./Sources/EzreadApp/AppDelegate.swift` (Create)
 
 *   **Type / Scope**: App.
 *   **Proposed Changes**: Startup and `application(_:open:)`, which receives the
@@ -400,57 +400,57 @@ created. Requirements: macOS 14 or later, Swift Package Manager, bundle id
     `Cmd+S`, and the item to install the command. The disk check is triggered on
     focus.
 
-#### 9. `./Sources/ZreadApp/WindowController.swift` (Create)
+#### 9. `./Sources/EzreadApp/WindowController.swift` (Create)
 
 *   **Type / Scope**: App.
 *   **Proposed Changes**: One window per root. Assembles the collapsible sidebar,
     the content area, and the switch between `ReaderView` and `SourceEditor`.
     Asks for confirmation when closing or switching files with an unsaved change.
 
-#### 10. `./Sources/ZreadApp/ReaderView.swift` (Create)
+#### 10. `./Sources/EzreadApp/ReaderView.swift` (Create)
 
 *   **Type / Scope**: App.
 *   **Proposed Changes**: Wraps the `WKWebView`. Loads the shell once and swaps
     the content by script. Exposes `topVisibleLine()` and `scrollTo(line:)`.
 
-#### 11. `./Sources/ZreadApp/SourceEditor.swift` (Create)
+#### 11. `./Sources/EzreadApp/SourceEditor.swift` (Create)
 
 *   **Type / Scope**: App.
 *   **Proposed Changes**: Plain text `NSTextView` with Menlo, without automatic
     quote or dash substitutions. Exposes the same line operations as
     `ReaderView`.
 
-#### 12. `./Sources/ZreadApp/FileTreeView.swift` (Create)
+#### 12. `./Sources/EzreadApp/FileTreeView.swift` (Create)
 
 *   **Type / Scope**: App.
 *   **Proposed Changes**: `NSOutlineView` fed by `RepoScanner`. Shows the tree as
     soon as the scan finishes, without blocking the first text.
 
-#### 13. `./Sources/ZreadApp/LocalScheme.swift` and `./Sources/ZreadApp/LinkRouter.swift` (Create)
+#### 13. `./Sources/EzreadApp/LocalScheme.swift` and `./Sources/EzreadApp/LinkRouter.swift` (Create)
 
 *   **Type / Scope**: App, security.
 *   **Proposed Changes**: `LocalScheme` serves bundle resources and root images
     through `PathGuard`. `LinkRouter` applies `LinkClassifier` to each WebView
     navigation, and blocks the rest.
 
-#### 14. `./Sources/ZreadApp/CLIInstaller.swift` (Create)
+#### 14. `./Sources/EzreadApp/CLIInstaller.swift` (Create)
 
 *   **Type / Scope**: App.
-*   **Proposed Changes**: Creates the symlink `/usr/local/bin/zread` to the
+*   **Proposed Changes**: Creates the symlink `/usr/local/bin/ezread` to the
     bundle's binary. Without permission, shows the command for the user to run.
 
-#### 15. `./Sources/zread-cli/main.swift` (Create)
+#### 15. `./Sources/ezread-cli/main.swift` (Create)
 
 *   **Type / Scope**: CLI.
 *   **Proposed Changes**: Resolves the argument (default `.`) to an absolute path
-    and calls `open -b com.pierryborges.zread`. A nonexistent path produces an
+    and calls `open -b com.pierryborges.ezread`. A nonexistent path produces an
     error on stderr and exit 1.
 
 #### 16. `./Resources/page.html` (Create)
 
 *   **Type / Scope**: Interface.
 *   **Proposed Changes**: Page shell, with the Content-Security-Policy that only
-    allows `zread://`.
+    allows `ezread://`.
 
 #### 17. `./Resources/reader.css` (Create)
 
@@ -482,7 +482,7 @@ created. Requirements: macOS 14 or later, Swift Package Manager, bundle id
 #### 21. `./scripts/bundle.sh` (Create)
 
 *   **Type / Scope**: Build.
-*   **Proposed Changes**: Compiles in release, assembles `zread.app` with the two
+*   **Proposed Changes**: Compiles in release, assembles `ezread.app` with the two
     binaries and `Resources`, and signs ad hoc.
 
 #### 22. `./scripts/measure.sh` and `./Tests/fixtures/long.md` (Create)
@@ -491,10 +491,10 @@ created. Requirements: macOS 14 or later, Swift Package Manager, bundle id
 *   **Proposed Changes**: Runs the app with the test document and records time to
     text, combined process memory, and bundle size, to compare with the targets.
 
-#### 23. `./Tests/ZreadCoreTests/*.swift` (Create)
+#### 23. `./Tests/EzreadCoreTests/*.swift` (Create)
 
 *   **Type / Scope**: Unit tests.
-*   **Proposed Changes**: One file per `ZreadCore` type: raw HTML discarded and
+*   **Proposed Changes**: One file per `EzreadCore` type: raw HTML discarded and
     `data-sourcepos` present; `.gitignore` respected and fallback without git;
     root resolved from folder and from file; path with `..` and symlink refused;
     classification of each link type; conflict on save.
@@ -511,7 +511,7 @@ created. Requirements: macOS 14 or later, Swift Package Manager, bundle id
 *   **Unit Tests**: `swift test`.
 *   **Static Analysis & Linting**: compilation without warnings.
 *   **Test Coverage Requirement**: all the logic of `PathGuard`, `LinkClassifier`,
-    and `DocumentSession.save`. The other `ZreadCore` types through the cases
+    and `DocumentSession.save`. The other `EzreadCore` types through the cases
     above.
 *   **E2E/Integration**: run the three CUJs by hand in a real repository. Open a
     malicious document with `<script>`, a remote image, and a `../../` link and

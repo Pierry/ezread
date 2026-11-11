@@ -1,6 +1,6 @@
 import AppKit
 import WebKit
-import ZreadCore
+import EzreadCore
 
 /// Decides every WebView navigation. Anything not recognized is cancelled.
 final class LinkRouter: NSObject, WKNavigationDelegate {

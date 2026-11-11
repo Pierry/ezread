@@ -1,5 +1,5 @@
 import XCTest
-@testable import ZreadCore
+@testable import EzreadCore
 
 final class MarkdownRendererTests: XCTestCase {
     func testDropsRawHTML() {
@@ -33,23 +33,23 @@ final class MarkdownRendererTests: XCTestCase {
 
     func testRewritesRelativeImageInSubfolder() {
         let html = MarkdownRenderer.render(markdown: "![x](img/a.png)", documentDirectory: "docs").html
-        XCTAssertTrue(html.contains("src=\"zread://root/docs/img/a.png\""))
+        XCTAssertTrue(html.contains("src=\"ezread://root/docs/img/a.png\""))
     }
 
     func testRewritesRelativeLinkKeepingFragment() {
         let html = MarkdownRenderer.render(markdown: "[x](other.md#part)", documentDirectory: "docs").html
-        XCTAssertTrue(html.contains("href=\"zread://root/docs/other.md#part\""))
+        XCTAssertTrue(html.contains("href=\"ezread://root/docs/other.md#part\""))
     }
 
     func testEncodesSpacesInDocumentDirectory() {
         XCTAssertEqual(
             MarkdownRenderer.rewrite(url: "a.md", documentDirectory: "my docs"),
-            "zread://root/my%20docs/a.md"
+            "ezread://root/my%20docs/a.md"
         )
     }
 
     func testRootAbsoluteLink() {
-        XCTAssertEqual(MarkdownRenderer.rewrite(url: "/a.md", documentDirectory: "docs"), "zread://root/a.md")
+        XCTAssertEqual(MarkdownRenderer.rewrite(url: "/a.md", documentDirectory: "docs"), "ezread://root/a.md")
     }
 
     func testLeavesExternalAndAnchorLinks() {

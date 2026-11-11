@@ -31,18 +31,18 @@ final class WelcomeWindowController: NSWindowController {
             icon.heightAnchor.constraint(equalToConstant: 112),
         ])
 
-        let title = label("zread", font: NSFont(name: "Helvetica Neue Bold", size: 34))
+        let title = label("ezread", font: NSFont(name: "Helvetica Neue Bold", size: 34))
         let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? ""
         let versionLabel = label("Version \(version)", font: NSFont(name: "Helvetica Neue", size: 13))
         versionLabel.alphaValue = 0.6
 
         let why = label(
             "Most Markdown gets read inside a code editor, in a side panel with tabs and toolbars all around it. "
-                + "zread was made so your docs can open like an article: just the text, set for reading.",
+                + "ezread was made so your docs can open like an article: just the text, set for reading.",
             font: NSFont(name: "Charter", size: 18)
         )
         let hint = label(
-            "Open a folder to browse its docs, or run zread . from any folder in Terminal.",
+            "Open a folder to browse its docs, or run ezread . from any folder in Terminal.",
             font: NSFont(name: "Charter", size: 15)
         )
         hint.alphaValue = 0.7

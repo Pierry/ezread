@@ -1,10 +1,10 @@
 import AppKit
-import ZreadCore
+import EzreadCore
 
 final class WindowController: NSWindowController, NSWindowDelegate, NSMenuItemValidation {
     private static let highlightLimit = 2 * 1024 * 1024
     private static let sidebarWidth: CGFloat = 260
-    private static let frameName = "zread.window"
+    private static let frameName = "ezread.window"
 
     private let root: URL
     private let split = NSSplitView()
@@ -500,8 +500,8 @@ final class WindowController: NSWindowController, NSWindowDelegate, NSMenuItemVa
         guard !measured else { return }
         measured = true
         let environment = ProcessInfo.processInfo.environment
-        guard let output = environment["ZREAD_MEASURE_OUT"],
-              let start = environment["ZREAD_MEASURE_START"].flatMap(Double.init) else { return }
+        guard let output = environment["EZREAD_MEASURE_OUT"],
+              let start = environment["EZREAD_MEASURE_START"].flatMap(Double.init) else { return }
         let milliseconds = Int((Date().timeIntervalSince1970 - start) * 1000)
         try? "\(milliseconds)\n".write(toFile: output, atomically: true, encoding: .utf8)
     }

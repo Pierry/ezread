@@ -2,21 +2,21 @@
 import PackageDescription
 
 let package = Package(
-    name: "zread",
+    name: "ezread",
     platforms: [.macOS(.v14)],
     dependencies: [
         .package(url: "https://github.com/swiftlang/swift-cmark.git", branch: "gfm"),
     ],
     targets: [
         .target(
-            name: "ZreadCore",
+            name: "EzreadCore",
             dependencies: [
                 .product(name: "cmark-gfm", package: "swift-cmark"),
                 .product(name: "cmark-gfm-extensions", package: "swift-cmark"),
             ]
         ),
-        .executableTarget(name: "ZreadApp", dependencies: ["ZreadCore"]),
-        .executableTarget(name: "zread-cli"),
-        .testTarget(name: "ZreadCoreTests", dependencies: ["ZreadCore"]),
+        .executableTarget(name: "EzreadApp", dependencies: ["EzreadCore"]),
+        .executableTarget(name: "ezread-cli"),
+        .testTarget(name: "EzreadCoreTests", dependencies: ["EzreadCore"]),
     ]
 )

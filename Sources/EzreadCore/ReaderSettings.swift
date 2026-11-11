@@ -3,12 +3,17 @@ import Foundation
 public struct ReaderSettings: Codable, Equatable {
     public enum FontStyle: String, Codable, CaseIterable {
         case medium
+        case charter
         case monospaced
     }
 
-    public enum Appearance: String, Codable {
+    public enum Appearance: String, Codable, CaseIterable {
         case light
         case dark
+        case solarizedLight
+        case solarizedDark
+
+        public var isDark: Bool { self == .dark || self == .solarizedDark }
     }
 
     public static let fontSizeRange = 14.0...32.0
@@ -25,8 +30,27 @@ public struct ReaderSettings: Codable, Equatable {
     public var primaryColor: String?
     public var letterSpacing: Double = -0.003
     public var lineHeight: Double = 1.6
+    public var bold: Bool = false
 
     public init() {}
+
+    private enum CodingKeys: String, CodingKey {
+        case appearance, fontSize, fontStyle, primaryColor, letterSpacing, lineHeight, bold
+    }
+
+    /// Missing or unknown keys fall back to the default, so settings saved by
+    /// an older or newer version still load instead of resetting everything.
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let defaults = ReaderSettings()
+        appearance = try? container.decodeIfPresent(Appearance.self, forKey: .appearance)
+        fontSize = (try? container.decodeIfPresent(Double.self, forKey: .fontSize)) ?? defaults.fontSize
+        fontStyle = (try? container.decodeIfPresent(FontStyle.self, forKey: .fontStyle)) ?? defaults.fontStyle
+        primaryColor = try? container.decodeIfPresent(String.self, forKey: .primaryColor)
+        letterSpacing = (try? container.decodeIfPresent(Double.self, forKey: .letterSpacing)) ?? defaults.letterSpacing
+        lineHeight = (try? container.decodeIfPresent(Double.self, forKey: .lineHeight)) ?? defaults.lineHeight
+        bold = (try? container.decodeIfPresent(Bool.self, forKey: .bold)) ?? defaults.bold
+    }
 
     /// Returns a copy with every value inside its allowed range. An invalid
     /// color is dropped, because this value is passed to the page.

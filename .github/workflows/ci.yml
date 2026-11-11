@@ -20,7 +20,7 @@ jobs:
         run: scripts/bundle.sh
       - name: Check the bundle
         run: |
-          test -x build/zread.app/Contents/MacOS/ZreadApp
-          test -x build/zread.app/Contents/MacOS/zread
-          test -f build/zread.app/Contents/Resources/web/reader.js
-          codesign --verify --deep build/zread.app
+          test -x build/ezread.app/Contents/MacOS/EzreadApp
+          test -x build/ezread.app/Contents/MacOS/ezread
+          test -f build/ezread.app/Contents/Resources/web/reader.js
+          codesign --verify --deep build/ezread.app

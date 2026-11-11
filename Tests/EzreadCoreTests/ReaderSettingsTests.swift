@@ -1,9 +1,9 @@
 import XCTest
-@testable import ZreadCore
+@testable import EzreadCore
 
 final class ReaderSettingsTests: XCTestCase {
     private var defaults: UserDefaults!
-    private let suite = "zread.tests.\(UUID().uuidString)"
+    private let suite = "ezread.tests.\(UUID().uuidString)"
 
     override func setUp() {
         defaults = UserDefaults(suiteName: suite)
@@ -41,6 +41,32 @@ final class ReaderSettingsTests: XCTestCase {
         let loaded = ReaderSettings.load(from: defaults)
         XCTAssertEqual(loaded.fontSize, 24)
         XCTAssertNil(loaded.appearance)
+    }
+
+    func testNewOptionsRoundTrip() {
+        var settings = ReaderSettings()
+        settings.appearance = .solarizedDark
+        settings.fontStyle = .charter
+        settings.bold = true
+        settings.save(to: defaults)
+        XCTAssertEqual(ReaderSettings.load(from: defaults), settings)
+    }
+
+    func testSettingsSavedBeforeBoldStillLoad() {
+        let old = #"{"appearance":"dark","fontSize":22,"fontStyle":"medium","letterSpacing":0.01,"lineHeight":1.7}"#
+        defaults.set(Data(old.utf8), forKey: "readerSettings")
+        let loaded = ReaderSettings.load(from: defaults)
+        XCTAssertEqual(loaded.fontSize, 22)
+        XCTAssertEqual(loaded.appearance, .dark)
+        XCTAssertFalse(loaded.bold)
+    }
+
+    func testUnknownThemeFallsBackToSystem() {
+        let saved = #"{"appearance":"neon","fontSize":22}"#
+        defaults.set(Data(saved.utf8), forKey: "readerSettings")
+        let loaded = ReaderSettings.load(from: defaults)
+        XCTAssertNil(loaded.appearance)
+        XCTAssertEqual(loaded.fontSize, 22)
     }
 
     func testClampsOutOfRangeValues() {

@@ -1,5 +1,5 @@
 #!/bin/bash
-# Builds build/zread.app from a release compile.
+# Builds build/ezread.app from a release compile.
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
@@ -8,18 +8,18 @@ cd "$(dirname "$0")/.."
 swift build -c release --disable-sandbox
 BIN="$(swift build -c release --disable-sandbox --show-bin-path)"
 
-APP=build/zread.app
+APP=build/ezread.app
 rm -rf "$APP"
 mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources/web"
 
-cp "$BIN/ZreadApp" "$APP/Contents/MacOS/ZreadApp"
-cp "$BIN/zread-cli" "$APP/Contents/MacOS/zread"
+cp "$BIN/EzreadApp" "$APP/Contents/MacOS/EzreadApp"
+cp "$BIN/ezread-cli" "$APP/Contents/MacOS/ezread"
 cp Resources/Info.plist "$APP/Contents/Info.plist"
-cp Resources/zread.icns "$APP/Contents/Resources/zread.icns"
+cp Resources/ezread.icns "$APP/Contents/Resources/ezread.icns"
 cp Resources/page.html Resources/reader.css Resources/reader.js "$APP/Contents/Resources/web/"
 cp -R Resources/vendor "$APP/Contents/Resources/web/vendor"
 
-strip -x "$APP/Contents/MacOS/ZreadApp" "$APP/Contents/MacOS/zread"
+strip -x "$APP/Contents/MacOS/EzreadApp" "$APP/Contents/MacOS/ezread"
 codesign --force --deep --sign - "$APP"
 
 echo "$APP"

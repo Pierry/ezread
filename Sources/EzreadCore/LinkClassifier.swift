@@ -15,7 +15,7 @@ public enum LinkClassifier {
         switch scheme {
         case "http", "https", "mailto":
             return .external
-        case "zread":
+        case "ezread":
             return classifyLocal(url)
         default:
             return .blocked

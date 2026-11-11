@@ -1,7 +1,7 @@
 import Foundation
 
 func fail(_ message: String) -> Never {
-    FileHandle.standardError.write(Data("zread: \(message)\n".utf8))
+    FileHandle.standardError.write(Data("ezread: \(message)\n".utf8))
     exit(1)
 }
 
@@ -46,5 +46,5 @@ do {
     fail("could not run open: \(error.localizedDescription)")
 }
 if process.terminationStatus != 0 {
-    fail("could not open zread. Is the app installed?")
+    fail("could not open ezread. Is the app installed?")
 }

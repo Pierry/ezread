@@ -1,5 +1,5 @@
 import XCTest
-@testable import ZreadCore
+@testable import EzreadCore
 
 final class ClaudeBridgeTests: XCTestCase {
     private var directory: URL!

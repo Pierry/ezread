@@ -1,5 +1,5 @@
 import XCTest
-@testable import ZreadCore
+@testable import EzreadCore
 
 final class AttentionBriefTests: XCTestCase {
     private func parse(_ json: String) throws -> AttentionBrief {

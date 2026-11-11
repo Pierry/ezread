@@ -1,11 +1,11 @@
 #!/bin/bash
-# Measures build/zread.app against the design targets: 500 ms, 30 MB, 200 MB.
+# Measures build/ezread.app against the design targets: 500 ms, 30 MB, 200 MB.
 # The first run is reported separately because WebKit may start cold.
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
 
-APP="$PWD/build/zread.app"
+APP="$PWD/build/ezread.app"
 DOC="$PWD/Tests/fixtures/long.md"
 RUNS="${1:-5}"
 OUT="$(mktemp -d)/measure"
@@ -33,7 +33,7 @@ for run in $(seq 1 "$RUNS"); do
   rm -f "$OUT"
   before="$(webkit_pids)"
   start="$(perl -MTime::HiRes=time -e 'printf "%.6f", time')"
-  open -n --env "ZREAD_MEASURE_OUT=$OUT" --env "ZREAD_MEASURE_START=$start" -a "$APP" "$DOC"
+  open -n --env "EZREAD_MEASURE_OUT=$OUT" --env "EZREAD_MEASURE_START=$start" -a "$APP" "$DOC"
 
   for _ in $(seq 1 200); do
     [ -s "$OUT" ] && break
@@ -43,7 +43,7 @@ for run in $(seq 1 "$RUNS"); do
   # The WebKit GPU process peaks for about 2 s after launch, then settles.
   perl -e 'select(undef, undef, undef, 5)'
 
-  app_pid="$(pgrep -nf "$APP/Contents/MacOS/ZreadApp" || true)"
+  app_pid="$(pgrep -nf "$APP/Contents/MacOS/EzreadApp" || true)"
   app_mb="$(footprint_mb "$app_pid")"
   web_mb=0
   for pid in $(comm -13 <(echo "$before") <(webkit_pids)); do

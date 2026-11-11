@@ -1,5 +1,5 @@
 import XCTest
-@testable import ZreadCore
+@testable import EzreadCore
 
 class TemporaryDirectoryTestCase: XCTestCase {
     var directory: URL!

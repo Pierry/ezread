@@ -1,5 +1,5 @@
 import AppKit
-import ZreadCore
+import EzreadCore
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
     private var controllers: [String: WindowController] = [:]
@@ -70,7 +70,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             controller.present(target: target)
             NSApp.activate(ignoringOtherApps: true)
         } catch RootResolverError.notMarkdown {
-            showAlert("zread only opens folders and Markdown files.", path)
+            showAlert("ezread only opens folders and Markdown files.", path)
         } catch {
             showAlert("Path not found.", path)
         }
@@ -104,7 +104,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     @objc func showAbout(_ sender: Any?) {
         let credits = NSAttributedString(
-            string: "A Markdown reader for macOS.\nOpen a folder or file with zread . or Cmd+O.",
+            string: "A Markdown reader for macOS.\nOpen a folder or file with ezread . or Cmd+O.",
             attributes: [
                 .font: NSFont.systemFont(ofSize: 11),
                 .foregroundColor: NSColor.labelColor,
@@ -121,15 +121,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private func buildMenu() -> NSMenu {
         let main = NSMenu()
 
-        add(to: main, "zread", [
-            item("About zread", #selector(showAbout(_:))),
-            item("Welcome to zread", #selector(showWelcome(_:))),
+        add(to: main, "ezread", [
+            item("About ezread", #selector(showAbout(_:))),
+            item("Welcome to ezread", #selector(showWelcome(_:))),
             .separator(),
             item("Settings…", #selector(WindowController.showSettings(_:)), ","),
-            item("Install zread Command", #selector(installCommand(_:))),
+            item("Install ezread Command", #selector(installCommand(_:))),
             .separator(),
-            item("Hide zread", #selector(NSApplication.hide(_:)), "h"),
-            item("Quit zread", #selector(NSApplication.terminate(_:)), "q"),
+            item("Hide ezread", #selector(NSApplication.hide(_:)), "h"),
+            item("Quit ezread", #selector(NSApplication.terminate(_:)), "q"),
         ])
         add(to: main, "File", [
             item("Open Folder or File…", #selector(openDocument(_:)), "o"),

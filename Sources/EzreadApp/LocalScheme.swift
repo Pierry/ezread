@@ -1,9 +1,9 @@
 import Foundation
 import UniformTypeIdentifiers
 import WebKit
-import ZreadCore
+import EzreadCore
 
-/// Serves `zread://app/` from the bundle and images under `zread://root/` from
+/// Serves `ezread://app/` from the bundle and images under `ezread://root/` from
 /// the open repository. Anything else fails.
 final class LocalScheme: NSObject, WKURLSchemeHandler {
     private static let imageExtensions: Set<String> = ["png", "jpg", "jpeg", "gif", "svg", "webp", "avif", "bmp", "ico"]
